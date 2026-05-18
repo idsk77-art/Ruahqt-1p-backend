@@ -89,6 +89,15 @@
       console.warn("Firebase Config가 없습니다. 오프라인 모드로 실행합니다.", e);
     }
 
+    /* ── 날짜 포맷 변환 헬퍼 (YYYY-MM-DD ➔ YYYY.MM.DD) ── */
+    const formatDateToDot = (str) => {
+      if (!str) return "";
+      if (typeof str === 'string' && str.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        return str.replace(/-/g, '.');
+      }
+      return str;
+    };
+
     /* ── 메인 App 컴포넌트 ── */
     function App() {
       const [qtData, setQtData] = useState(null);
@@ -173,7 +182,7 @@
 
       /* ── 스크롤 감지 및 구글 시트 데이터 로드 ── */
       useEffect(() => {
-        // 대형 헤더 영역(약 180px)이 화면에서 스크롤되어 사라질 즈음 축소 고정창이 내려오도록 설정합니다.
+        // 대형 헤더 영역이 화면에서 스크롤되어 사라질 즈음 축소 고정창이 내려오도록 설정합니다.
         const onScroll = () => setIsScrolled(window.scrollY > 150);
         window.addEventListener("scroll", onScroll);
 
@@ -257,16 +266,19 @@
 
       const dateStr = getVal(["날짜", "Date"], "");
       const refStr = getVal(["본문주소", "주소", "Reference"], "오늘의 말씀");
+      const titleStr = getVal(["제목", "주제", "묵상제목", "Title"], "");
       const versesText = getVal(["본문내용", "말씀본문", "본문"], "");
       const medText = getVal(["말씀묵상", "묵상"], "");
       const prayerText = getVal(["기도", "오늘의기도"], "");
 
-      const baseFontSize = Math.round(18 * fontScale);   // 말씀묵상 & 기도문: 기본 18px
-      const verseFontSize = Math.round(16 * fontScale);  // 성경말씀 본문: 기본 16px
-      const verseNumSize = Math.round(12 * fontScale);   // 본문내용 절수표시: 기본 12px
+      const baseFontSize = Math.round(18 * fontScale);   // 말씀묵상 & 기도문 본문: 기본 18px (동적)
+      const verseFontSize = Math.round(18 * fontScale);  // 성경 본문 말씀 크기: 기본 18px (동적)
+
+      /* ── 절수 표시 크기는 항상 12px 고정 (배율 제거) ── */
+      const verseNumSize = 12;   
       
       const dynBodyStyle = { margin: `0 0 ${20 * fontScale}px`, lineHeight: "2", fontSize: `${baseFontSize}px`, color: C.text };
-      const dynVerseStyle = { margin: `0 0 ${18 * fontScale}px`, lineHeight: "2", fontSize: `${verseFontSize}px`, color: C.text };
+      const dynVerseStyle = { margin: "0 0 18px", lineHeight: "2", fontSize: `${verseFontSize}px`, color: C.text };
       const zoomBtnStyle = { background: "transparent", border: "1px solid rgba(255,255,255,0.2)", color: "#FFFFFF", width: "36px", height: "32px", borderRadius: "6px", display: "flex", justifyContent: "center", alignItems: "center", fontSize: "14px", cursor: "pointer", fontFamily: "sans-serif" };
 
       const handleShareLink = () => {
@@ -284,8 +296,8 @@
           ? prayerText.replace(/<[^>]*>/g, '').split('\n').map(line => line.trim()).filter(Boolean).join('\n\n')
           : "";
 
-        const fullShareText = `[루아큐티 · ${dateStr}]
-${refStr}
+        const fullShareText = `[루아큐티 · ${formatDateToDot(dateStr)}]
+${titleStr ? `${titleStr} (${refStr})` : refStr}
 
 ■ 본문 내용
 ${cleanVerses}
@@ -311,24 +323,25 @@ ${cleanPrayer}
           let isSubtitle = false;
           let content = trimmed;
 
-          const subSymbols = ['■', '◼', '▪', '❝', '▶', '✔', '✅', '✦', '★'];
-          const startsWithSymbol = subSymbols.some(symbol => trimmed.startsWith(symbol));
+          // "❝ 핵심 구절 ❞" 형태의 텍스트가 들어오면 자동으로 "◼︎ 핵심 구절"로 자동 변환하여 정돈합니다.
+          content = content.replace(/❝\s*(.*?)\s*❞/g, '◼︎ $1');
+
+          const subSymbols = ['■', '◼', '◼︎', '▪', '❝', '▶', '✔', '✅', '✦', '★'];
+          const startsWithSymbol = subSymbols.some(symbol => content.startsWith(symbol));
 
           if (startsWithSymbol) {
             isSubtitle = true;
-            content = trimmed;
-          } else if (trimmed.startsWith('# ')) {
+          } else if (content.startsWith('# ')) {
             isSubtitle = true;
-            content = trimmed.substring(2).trim();
-          } else if (trimmed.match(/^\[(.*)\]$/)) {
+            content = content.substring(2).trim();
+          } else if (content.match(/^\[(.*)\]$/)) {
             isSubtitle = true;
-            content = trimmed;
           }
 
           if (isSubtitle) {
             const subStyle = {
               margin: idx === 0 ? `0 0 ${8 * fontScale}px` : `${24 * fontScale}px 0 ${10 * fontScale}px`,
-              fontSize: `${baseFontSize * 0.88}px`,
+              fontSize: "16px",        // 크기 16px 고정
               color: C.text,
               fontWeight: "800",
               letterSpacing: "-0.8px",
@@ -376,8 +389,7 @@ ${cleanPrayer}
         <div style={{ background: C.bgPage, minHeight: "100vh", color: C.text, fontFamily: serif }}>
           {error && <div style={{ background: "#FEF2F2", color: "#991B1B", padding: "10px", fontSize: "13px", textAlign: "center", fontFamily: "sans-serif", borderBottom: "1px solid #FCA5A5" }}>⚠️ {error}</div>}
 
-          {/* ══ [신규] PERSISTENT COMPACT HEADER (스크롤용 슬라이딩 고정 상단창) ══ */}
-          {/* 평소에는 위로 올라가 숨겨져 있으며, 스크롤 150px 이상 도달 시 부드럽게 미끄러지듯 내려옵니다 */}
+          {/* ══ PERSISTENT COMPACT HEADER (스크롤용 슬라이딩 고정 상단창) ══ */}
           <header style={{ 
             position: "fixed", 
             top: 0, 
@@ -404,8 +416,11 @@ ${cleanPrayer}
               alignItems: "center" 
             }}>
               <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-                <span style={{ fontSize: "18px", fontWeight: "800", color: "#FFFFFF", letterSpacing: "-0.5px", lineHeight: "1.2" }}>{refStr}</span>
-                <span style={{ fontFamily: "sans-serif", fontSize: "12px", fontWeight: "400", color: "#A1A1AA", letterSpacing: "0.5px" }}>{dateStr}</span>
+                {/* [요청사항 반영] 고정식 상단창의 주제 폰트 크기를 기존 16px에서 18px로 조정했습니다 */}
+                <span style={{ fontSize: "18px", fontWeight: "800", color: "#FFFFFF", letterSpacing: "-0.5px", lineHeight: "1.2" }}>{titleStr || refStr}</span>
+                <span style={{ fontFamily: "sans-serif", fontSize: "11px", fontWeight: "400", color: "#A1A1AA", letterSpacing: "0.5px" }}>
+                  {titleStr ? `${refStr} · ${formatDateToDot(dateStr)}` : formatDateToDot(dateStr)}
+                </span>
               </div>
               <div style={{ display: "flex", gap: "8px" }}>
                 <button onClick={handleShareLink} style={zoomBtnStyle} title="링크 공유">🔗</button>
@@ -415,8 +430,8 @@ ${cleanPrayer}
             </div>
           </header>
 
-          {/* ══ [신규] STATIC MAIN HEADER (본문에 완전히 붙어서 자연스럽게 움직이는 정적 대형 상단창) ══ */}
-          <div style={{ background: C.headerBg, padding: "40px 24px" }}>
+          {/* ══ STATIC MAIN HEADER (매거진 스타일 대형 상단창) ══ */}
+          <div style={{ background: C.headerBg, padding: "40px 24px 48px" }}>
             <div style={{ maxWidth: "800px", margin: "0 auto" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "32px" }}>
                 <div style={{ display: "flex", alignItems: "baseline", gap: "10px" }}>
@@ -429,16 +444,44 @@ ${cleanPrayer}
                   <button onClick={handleZoomIn} style={zoomBtnStyle}>A+</button>
                 </div>
               </div>
-              <div style={{ width: "32px", height: "1px", background: "#52525B", marginBottom: "20px" }} />
-              <div style={{ display: "flex", alignItems: "baseline", gap: "12px", flexWrap: "wrap" }}>
-                <div style={{ fontSize: "36px", fontWeight: "800", color: "#FFFFFF", lineHeight: "1.1", letterSpacing: "-1px" }}>{refStr}</div>
-                <div style={{ fontFamily: "sans-serif", fontSize: "16px", fontWeight: "400", color: "#A1A1AA", letterSpacing: "1px" }}>{dateStr}</div>
+              
+              {/* 이미지 스타일에 맞춘 얇은 전면구분선 */}
+              <div style={{ width: "100%", height: "1px", background: "rgba(255,255,255,0.15)", marginBottom: "24px" }} />
+              
+              {/* 타이포그래피 정렬 개선 */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+                {/* 1. 깔끔한 YYYY.MM.DD 날짜 표시 */}
+                <div style={{ fontFamily: "sans-serif", fontSize: "15px", fontWeight: "400", color: "#A1A1AA", letterSpacing: "1px" }}>
+                  {formatDateToDot(dateStr)}
+                </div>
+                
+                {/* 2. 대형 주제 제목 */}
+                <div style={{ fontSize: "36px", fontWeight: "800", color: "#FFFFFF", lineHeight: "1.25", letterSpacing: "-1px" }}>
+                  {titleStr || refStr}
+                </div>
+                
+                {/* 3. 성경주소 알약형 캡슐 */}
+                {titleStr && (
+                  <div style={{ marginTop: "6px" }}>
+                    <div style={{ 
+                      display: "inline-block", 
+                      border: "1px solid rgba(255,255,255,0.25)", 
+                      borderRadius: "9999px", 
+                      padding: "6px 16px", 
+                      fontSize: "13px", 
+                      color: "#E4E4E7",
+                      fontFamily: "sans-serif",
+                      letterSpacing: "0.5px"
+                    }}>
+                      {refStr}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
 
           {/* ══ MAIN CONTENT AREA ══ */}
-          {/* Spacer를 없애고 헤더 밑으로 자연스럽게 이어지도록 설계했습니다 */}
           <main style={{ maxWidth: "800px", margin: "0 auto", padding: "48px 24px 80px" }}>
             {versesText && <Section label="본문 내용" icon="📖">{formatVerses(versesText)}</Section>}
             {medText && <Section label="말씀 묵상" icon="📝">{formatText(medText)}</Section>}
