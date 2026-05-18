@@ -174,7 +174,7 @@
 
       /* ── 스크롤 감지 및 구글 시트 데이터 로드 ── */
       useEffect(() => {
-        const onScroll = () => setIsScrolled(window.scrollY > 50);
+        const onScroll = () => setIsScrolled(window.scrollY > 60);
         window.addEventListener("scroll", onScroll);
 
         const link = document.createElement("link");
@@ -244,7 +244,7 @@
       if (loading) {
         return (
           <div style={{ background: C.bgPage, height: "100vh", display: "flex", justifyContent: "center", alignItems: "center", fontFamily: serif, color: C.text }}>
-            <div style={{ textAlign: "center" }}><div style={{ fontSize: "28px", marginBottom: "14px" }}>📖</div><div style={{ fontSize: "14px", color: C.textSub, fontFamily: "sans-serif" }}>준비 중...</div></div>
+            <div style={{ textShadow: "none", textAlign: "center" }}><div style={{ fontSize: "28px", marginBottom: "14px" }}>📖</div><div style={{ fontSize: "14px", color: C.textSub, fontFamily: "sans-serif" }}>준비 중...</div></div>
           </div>
         );
       }
@@ -378,10 +378,36 @@ ${cleanPrayer}
           {error && <div style={{ background: "#FEF2F2", color: "#991B1B", padding: "10px", fontSize: "13px", textAlign: "center", fontFamily: "sans-serif", borderBottom: "1px solid #FCA5A5" }}>⚠️ {error}</div>}
 
           {/* ══ STICKY HEADER ══ */}
-          <header style={{ position: "sticky", top: 0, zIndex: 100, background: C.headerBg, borderBottom: isScrolled ? "1px solid #27272A" : "none", boxShadow: isScrolled ? "0 4px 12px rgba(0,0,0,0.15)" : "none", transition: "all 0.3s ease" }}>
-            <div style={{ maxWidth: "800px", margin: "0 auto", padding: isScrolled ? "12px 24px" : "40px 24px", transition: "padding 0.3s ease" }}>
+          {/* 높이 자체를 CSS Transition으로 부드럽게 제어합니다 */}
+          <header style={{ 
+            position: "sticky", 
+            top: 0, 
+            zIndex: 100, 
+            background: C.headerBg, 
+            borderBottom: isScrolled ? "1px solid #27272A" : "none", 
+            boxShadow: isScrolled ? "0 4px 12px rgba(0,0,0,0.15)" : "none", 
+            transition: "height 0.28s cubic-bezier(0.4, 0, 0.2, 1), border-bottom 0.28s ease, box-shadow 0.28s ease",
+            height: isScrolled ? "76px" : "180px",
+            overflow: "hidden"
+          }}>
+            <div style={{ 
+              maxWidth: "800px", 
+              margin: "0 auto", 
+              height: "100%",
+              position: "relative" // 내부 절대좌표 요소를 감싸기 위한 기준점
+            }}>
               
-              <div style={{ display: isScrolled ? "none" : "block" }}>
+              {/* 1. 확장 모드 (스크롤 전 기본 노출) */}
+              <div style={{ 
+                position: "absolute",
+                top: "32px",
+                left: "24px",
+                right: "24px",
+                opacity: isScrolled ? 0 : 1,
+                transform: isScrolled ? "scale(0.96) translateY(-12px)" : "scale(1) translateY(0)",
+                transition: "opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
+                pointerEvents: isScrolled ? "none" : "auto"
+              }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "32px" }}>
                   <div style={{ display: "flex", alignItems: "baseline", gap: "10px" }}><h1 style={{ margin: 0, fontFamily: "'DM Serif Display', serif", fontSize: "28px", color: "#FFFFFF", fontWeight: "400" }}>RuahQT</h1><span style={{ fontFamily: "sans-serif", fontSize: "12px", color: "#A1A1AA", letterSpacing: "1px" }}>루아큐티</span></div>
                   <div style={{ display: "flex", gap: "8px" }}>
@@ -397,8 +423,21 @@ ${cleanPrayer}
                 </div>
               </div>
 
-              {/* 축소 모드 (스크롤 후) - 성경주소와 날짜에 세로 줄바꿈(flex-direction: column)을 적용해 컴팩트하게 구성 */}
-              <div style={{ display: isScrolled ? "flex" : "none", justifyContent: "space-between", alignItems: "center" }}>
+              {/* 2. 축소 모드 (스크롤 후 노출) */}
+              {/* 절대 배치 및 상하 중앙정렬(translateY(-50%))을 통해 레이아웃 겹침을 완벽히 방지합니다 */}
+              <div style={{ 
+                position: "absolute",
+                top: "50%",
+                left: "24px",
+                right: "24px",
+                transform: isScrolled ? "translateY(-50%) scale(1)" : "translateY(-30%) scale(0.96)",
+                opacity: isScrolled ? 1 : 0,
+                transition: "opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
+                pointerEvents: isScrolled ? "auto" : "none",
+                display: "flex", 
+                justifyContent: "space-between", 
+                alignItems: "center" 
+              }}>
                 <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
                   <span style={{ fontSize: "18px", fontWeight: "800", color: "#FFFFFF", letterSpacing: "-0.5px", lineHeight: "1.2" }}>{refStr}</span>
                   <span style={{ fontFamily: "sans-serif", fontSize: "12px", fontWeight: "400", color: "#A1A1AA", letterSpacing: "0.5px" }}>{dateStr}</span>
@@ -409,6 +448,7 @@ ${cleanPrayer}
                   <button onClick={handleZoomIn} style={zoomBtnStyle}>A+</button>
                 </div>
               </div>
+
             </div>
           </header>
 
