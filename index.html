@@ -24,6 +24,22 @@
       padding: 0;
       background-color: #000000;
     }
+
+    /* ── 구글시트 마크(형광펜) 태그 컬러 원본 유지 스타일 ── */
+    mark {
+      background-color: rgba(250, 204, 21, 0.28); /* 기본 노란색 */
+      color: inherit;
+      padding: 0 4px;
+      border-radius: 3px;
+    }
+    mark.hl-yellow { background-color: rgba(250, 204, 21, 0.35); }
+    mark.hl-orange { background-color: rgba(249, 115, 22, 0.25); }
+    mark.hl-red    { background-color: rgba(239, 68, 68, 0.25); }
+    mark.hl-green  { background-color: rgba(34, 197, 94, 0.25); }
+    mark.hl-blue   { background-color: rgba(59, 130, 246, 0.25); }
+    mark.hl-purple { background-color: rgba(168, 85, 247, 0.25); }
+    mark.hl-pink   { background-color: rgba(236, 72, 153, 0.25); }
+    mark.hl-gray   { background-color: rgba(161, 161, 170, 0.25); }
   </style>
 </head>
 <body>
@@ -45,21 +61,9 @@
       border:   "#E5E7EB",
     };
 
-    /* ── 하이라이트 스타일 변환 ── */
-    const hlStyles = {
-      yellow: "background: rgba(250,204,21,0.28); border-bottom: 2px solid rgba(234,179,8,0.65); padding: 0 3px; border-radius: 2px;",
-      amber:  "background: rgba(251,146,60,0.2); border-bottom: 2px solid rgba(234,88,12,0.5); padding: 0 3px; border-radius: 2px;",
-      coral:  "border-bottom: 2.5px solid #F87171; padding-bottom: 1px;",
-      green:  "background: rgba(52,211,153,0.18); border-bottom: 2px solid rgba(16,185,129,0.55); padding: 0 3px; border-radius: 2px;",
-      blue:   "border-bottom: 2.5px solid #93C5FD; padding-bottom: 1px;",
-      pink:   "background: rgba(251,113,133,0.15); border-bottom: 2px dashed rgba(244,63,94,0.5); padding: 0 3px; border-radius: 2px;",
-    };
-
     const processHTML = (text) => {
       if (!text) return "";
-      return String(text)
-        .replace(/<HL\s+type="([^"]+)">/g, (_, type) => `<span style="${hlStyles[type] || hlStyles.yellow}">`)
-        .replace(/<\/HL>/g, '</span>');
+      return String(text); // 태그 데이터를 훼손하지 않고 원본 그대로 넘깁니다.
     };
 
     /* ── Section Component ── */
@@ -75,7 +79,7 @@
     const serif = "'Nanum Myeongjo', 'Apple Myungjo', 'Batang', Georgia, serif";
     let hasCountedVisit = false;
 
-    /* ── Firebase 초기화 로직 (환경 설정이 제공되지 않으면 오프라인 모드로 안전 동작) ── */
+    /* ── Firebase 초기화 로직 ── */
     let app, auth, db, appId;
     try {
       if (typeof __firebase_config !== 'undefined') {
@@ -89,7 +93,7 @@
       console.warn("Firebase Config가 없습니다. 오프라인 모드로 실행합니다.", e);
     }
 
-    /* ── 날짜 포맷 변환 헬퍼 (YYYY-MM-DD ➔ YYYY.MM.DD) ── */
+    /* ── 날짜 포맷 변환 헬퍼 ── */
     const formatDateToDot = (str) => {
       if (!str) return "";
       if (typeof str === 'string' && str.match(/^\d{4}-\d{2}-\d{2}$/)) {
@@ -249,10 +253,28 @@
         };
       }, []);
 
+      /* ── [개선 완료] 이미지와 완벽하게 일치하는 로딩 화면 적용 ── */
       if (loading) {
         return (
-          <div style={{ background: C.bgPage, height: "100vh", display: "flex", justifyContent: "center", alignItems: "center", fontFamily: serif, color: C.text }}>
-            <div style={{ textShadow: "none", textAlign: "center" }}><div style={{ fontSize: "28px", marginBottom: "14px" }}>📖</div><div style={{ fontSize: "14px", color: C.textSub, fontFamily: "sans-serif" }}>준비 중...</div></div>
+          <div style={{ background: C.bgPage, height: "100vh", display: "flex", justifyContent: "center", alignItems: "center" }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "20px" }}>
+              <div style={{
+                width: "82px",
+                height: "82px",
+                borderRadius: "50%",
+                backgroundColor: "#F8F6F2", // 이미지의 부드러운 베이지 배경색
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center"
+              }}>
+                <svg style={{ transform: "scaleX(-1)" }} viewBox="0 0 512 512" width="38" height="38" fill="#B9A58E">
+                  <path d="M502.5 137.3l-13.8 29.5c-13.6 29-45 44-77 36l-85.3-21c-22.3-5.5-45.7 4-57.8 23.5L258 223.5c-20 32-52.6 51.5-90.5 52.5L22.8 281.3C9 281.8-.8 294.6 1.4 308.2c4.7 28.5 21.6 53 47.3 68.3l12.4 7.4c13.8 8.2 31.4 6 43.6-5.5l14-13.5c15.2-14.7 38.3-15.6 54-2l21.2 18.5c14.7 12.8 36.3 13.8 52 2.4l19.5-14.2c16-11.7 38-11.4 53.2 1l25 21.2c15.7 13.3 39 12.7 53.6-1.5l11-10.7c17.6-17.2 45.4-18 63.8-1.8l10.4 9.2c14.6 12.8 36.6 12.2 50.4-1.4l16.7-16.5c17.5-17.3 19.3-45 4-63.5L463 268.5c-13-16-17-37-10.6-56l22.4-66c6.2-18.4-4-38.5-21.7-44.4-18.2-6-38 3.5-44.5 21.4zM245.5 145c11.3 0 20.5-9.2 20.5-20.5S256.8 104 245.5 104 225 113.2 225 124.5s9.2 20.5 20.5 20.5z" />
+                </svg>
+              </div>
+              <div style={{ fontFamily: "'Noto Sans KR', sans-serif", fontSize: "16px", color: "#8E8E93", fontWeight: "600", letterSpacing: "0.5px" }}>
+                루아큐티 준비 중...
+              </div>
+            </div>
           </div>
         );
       }
@@ -286,7 +308,6 @@
         }
       });
 
-      // 동일한 성경 권(Book)인 경우 범위를 묶어줍니다
       const groupedRefs = [];
       parsedRefs.forEach(ref => {
         const existing = groupedRefs.find(g => g.book === ref.book);
@@ -297,19 +318,17 @@
         }
       });
 
-      // UI 및 내보내기용 포맷 텍스트 완성
       const formattedGroupedRefs = groupedRefs.map(g => `${g.book} ${g.ranges.join(', ')}`);
-      const refTextDot = formattedGroupedRefs.join(' · ');   // 고정창 및 푸터용
-      const refTextComma = formattedGroupedRefs.join(', '); // 공유 전송 텍스트용
+      const refTextDot = formattedGroupedRefs.join(' · ');   
+      const refTextComma = formattedGroupedRefs.join(', '); 
 
-      const baseFontSize = Math.round(18 * fontScale);   // 말씀묵상 & 기도문 본문: 기본 18px (동적)
-      const verseFontSize = Math.round(18 * fontScale);  // 성경 본문 말씀 크기: 기본 18px (동적)
+      const baseFontSize = Math.round(18 * fontScale);   
+      const verseFontSize = Math.round(18 * fontScale);  
 
-      /* ── 절수 표시 크기는 항상 12px 고정 (배율 제거) ── */
       const verseNumSize = 12;   
       
-      const dynBodyStyle = { margin: `0 0 ${20 * fontScale}px`, lineHeight: "2", fontSize: `${baseFontSize}px`, color: C.text };
-      const dynVerseStyle = { margin: "0 0 18px", lineHeight: "2", fontSize: `${verseFontSize}px`, color: C.text };
+      const dynBodyStyle = { margin: `0 0 ${20 * fontScale}px`, lineHeight: "2", fontSize: `${baseFontSize}px` };
+      const dynVerseStyle = { margin: "0 0 18px", lineHeight: "2", fontSize: `${verseFontSize}px` };
       const zoomBtnStyle = { background: "transparent", border: "1px solid rgba(255,255,255,0.2)", color: "#FFFFFF", width: "36px", height: "32px", borderRadius: "6px", display: "flex", justifyContent: "center", alignItems: "center", fontSize: "14px", cursor: "pointer", fontFamily: "sans-serif" };
 
       const handleShareLink = () => {
@@ -354,26 +373,27 @@ ${cleanPrayer}
           let isSubtitle = false;
           let content = trimmed;
 
-          // "❝ 핵심 구절 ❞" 형태의 텍스트가 들어오면 자동으로 "◼︎ 핵심 구절"로 자동 변환하여 정돈합니다.
           content = content.replace(/❝\s*(.*?)\s*❞/g, '◼︎ $1');
 
+          // HTML 태그를 무시한 순수 텍스트를 추출하여 기호를 감지합니다.
+          const plainText = content.replace(/<[^>]*>/g, '').trim();
+
           const subSymbols = ['■', '◼', '◼︎', '▪', '❝', '▶', '✔', '✅', '✦', '★'];
-          const startsWithSymbol = subSymbols.some(symbol => content.startsWith(symbol));
+          const startsWithSymbol = subSymbols.some(symbol => plainText.startsWith(symbol));
 
           if (startsWithSymbol) {
             isSubtitle = true;
-          } else if (content.startsWith('# ')) {
+          } else if (plainText.startsWith('# ')) {
             isSubtitle = true;
-            content = content.substring(2).trim();
-          } else if (content.match(/^\[(.*)\]$/)) {
+            content = content.replace(/#\s*/, '');
+          } else if (plainText.match(/^\[(.*)\]$/)) {
             isSubtitle = true;
           }
 
           if (isSubtitle) {
             const subStyle = {
               margin: idx === 0 ? `0 0 ${8 * fontScale}px` : `${24 * fontScale}px 0 ${10 * fontScale}px`,
-              fontSize: "16px",        // 크기 16px 고정
-              color: C.text,
+              fontSize: "16px",
               fontWeight: "800",
               letterSpacing: "-0.8px",
               lineHeight: "1.6"
@@ -387,7 +407,7 @@ ${cleanPrayer}
         });
       };
 
-      /* ── [요청 반영] 본문내용 영역에 장수나 권 이름의 라벨을 표시하지 않도록 완전 정돈 ── */
+      /* ── [개선 완료] 성경 본문 내어쓰기(Hanging Indent) 레이아웃 적용 ── */
       const formatVerses = (text) => {
         if (!text) return <p style={{ color: C.textMute }}>본문 내용이 없습니다.</p>;
 
@@ -399,9 +419,7 @@ ${cleanPrayer}
               let currentVerse = "";
               let content = line;
 
-              // 1. "장:절" 이 함께 들어있는 경우 (예: "22:20 말씀" ➔ "22"는 제외하고 "20"절만 파싱)
               const complexMatch = line.match(/^\s*(\d+)\s*[:장]\s*(\d+)[절:.\s\|]*(.*)$/);
-              // 2. 절 번호만 존재하는 일반 패턴 분석 (예: "20 말씀")
               const simpleMatch = line.match(/^\s*(\d+)[절:.\s\|]+(.*)$/);
 
               if (complexMatch) {
@@ -412,12 +430,31 @@ ${cleanPrayer}
                 content = simpleMatch[2];
               }
 
-              const html = currentVerse 
-                ? `<span style="font-weight: 800; color: #71717A; margin-right: 12px; font-family: sans-serif; font-size: ${verseNumSize}px; display: inline-block; min-width: 18px;">${currentVerse}</span>` + processHTML(content) 
-                : processHTML(content);
+              if (currentVerse) {
+                return (
+                  <div key={idx} style={{ ...dynVerseStyle, display: "flex", alignItems: "flex-start" }}>
+                    {/* 절 번호 고정 영역 (숫자만 좌측에 고정시켜 본문 텍스트 내어쓰기를 구현합니다) */}
+                    <div style={{
+                      fontWeight: "800",
+                      color: "#71717A",
+                      fontFamily: "sans-serif",
+                      fontSize: `${verseNumSize}px`,
+                      width: "28px",         // 번호가 들어갈 고정 공간 확보
+                      flexShrink: 0,         // 공간 찌그러짐 방지
+                      textAlign: "left",
+                      marginTop: "5px"       // 본문 18px 폰트의 기준선과 시각적으로 정렬
+                    }}>
+                      {currentVerse}
+                    </div>
+                    {/* 우측 말씀 본문 영역 */}
+                    <div style={{ flex: 1 }} dangerouslySetInnerHTML={{ __html: processHTML(content) }} />
+                  </div>
+                );
+              }
 
+              // 절 번호가 없는 일반 라인일 경우
               return (
-                <p key={idx} style={dynVerseStyle} dangerouslySetInnerHTML={{ __html: html }} />
+                <div key={idx} style={dynVerseStyle} dangerouslySetInnerHTML={{ __html: processHTML(content) }} />
               );
             })}
           </div>
@@ -446,8 +483,6 @@ ${cleanPrayer}
         <div style={{ background: C.bgPage, minHeight: "100vh", color: C.text, fontFamily: serif }}>
           {error && <div style={{ background: "#FEF2F2", color: "#991B1B", padding: "10px", fontSize: "13px", textAlign: "center", fontFamily: "sans-serif", borderBottom: "1px solid #FCA5A5" }}>⚠️ {error}</div>}
 
-          {/* ══ PERSISTENT COMPACT HEADER (스크롤용 슬라이딩 고정 상단창) ══ */}
-          {/* [요청 반영] 상단 고정창의 배경에도 왼쪽에서 오른쪽으로 흐르는 그라데이션 적용 */}
           <header style={{ 
             position: "fixed", 
             top: 0, 
@@ -487,8 +522,6 @@ ${cleanPrayer}
             </div>
           </header>
 
-          {/* ══ STATIC MAIN HEADER (매거진 스타일 대형 상단창) ══ */}
-          {/* [요청 반영] 오른쪽 검정색에서 왼쪽 #002337 컬러로 연결되는 고급스러운 자연풍 그라데이션 배경 구현 */}
           <div style={{ 
             background: "linear-gradient(to right, #002337, #121212)", 
             padding: "40px 24px 48px" 
@@ -506,22 +539,17 @@ ${cleanPrayer}
                 </div>
               </div>
               
-              {/* 이미지 스타일에 맞춘 얇은 전면구분선 */}
               <div style={{ width: "100%", height: "1px", background: "rgba(255,255,255,0.15)", marginBottom: "24px" }} />
               
-              {/* 타이포그래피 정렬 개선 */}
               <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-                {/* 1. 깔끔한 YYYY.MM.DD 날짜 표시 */}
                 <div style={{ fontFamily: "sans-serif", fontSize: "15px", fontWeight: "400", color: "#A1A1AA", letterSpacing: "1px" }}>
                   {formatDateToDot(dateStr)}
                 </div>
                 
-                {/* 2. 대형 주제 제목 */}
                 <div style={{ fontSize: "36px", fontWeight: "800", color: "#FFFFFF", lineHeight: "1.25", letterSpacing: "-1px" }}>
                   {titleStr || refTextDot}
                 </div>
                 
-                {/* 3. 성경주소 알약형 캡슐 */}
                 {titleStr && groupedRefs.length > 0 && (
                   <div style={{ marginTop: "6px", display: "flex", flexWrap: "wrap", gap: "8px" }}>
                     {groupedRefs.map((group, idx) => (
@@ -544,7 +572,6 @@ ${cleanPrayer}
             </div>
           </div>
 
-          {/* ══ MAIN CONTENT AREA ══ */}
           <main style={{ maxWidth: "800px", margin: "0 auto", padding: "48px 24px 80px" }}>
             {versesText && <Section label="본문 내용" icon="📖">{formatVerses(versesText)}</Section>}
             {medText && <Section label="말씀 묵상" icon="📝">{formatText(medText)}</Section>}
@@ -552,7 +579,7 @@ ${cleanPrayer}
               <Section label="오늘의 기도" icon="🙏">
                 <div style={{ background: "#FAFAFA", padding: "32px 32px 40px", borderRadius: "12px", borderLeft: "4px solid #D1D1D6" }}>
                   {String(prayerText).split('\n').filter(l => l.trim()).map((line, idx) => (
-                    <p key={idx} style={{ margin: `0 0 ${20 * fontScale}px`, fontSize: `${baseFontSize}px`, lineHeight: "2", color: C.text }} dangerouslySetInnerHTML={{ __html: processHTML(line) }} />
+                    <p key={idx} style={{ margin: `0 0 ${20 * fontScale}px`, fontSize: `${baseFontSize}px`, lineHeight: "2" }} dangerouslySetInnerHTML={{ __html: processHTML(line) }} />
                   ))}
                 </div>
               </Section>
@@ -564,7 +591,6 @@ ${cleanPrayer}
             </div>
           </main>
 
-          {/* ── Footer ── */}
           <footer style={{ background: "#FAFAFA", borderTop: `1px solid ${C.border}` }}>
             <div style={{ maxWidth: "800px", margin: "0 auto", padding: "40px 24px" }}>
               <p style={{ fontFamily: "sans-serif", fontSize: "12px", color: C.textMute, lineHeight: "2", margin: 0 }}>
@@ -586,7 +612,6 @@ ${cleanPrayer}
             </div>
           </footer>
 
-          {/* ══ 토스트 알림 ══ */}
           {toast.show && (
             <div style={{
               position: "fixed",
@@ -612,7 +637,6 @@ ${cleanPrayer}
       );
     }
 
-    // React 18 렌더링 방식 적용
     const root = ReactDOM.createRoot(document.getElementById('root'));
     root.render(<App />);
   </script>
