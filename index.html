@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RuahQT - 루아큐티</title>
+
+  <!-- ── 1. React & ReactDOM CDN ── -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+
+  <!-- ── 2. Babel (브라우저 내 JSX 실시간 변환기) ── -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- ── 3. Firebase SDK v9 Compatibility (CDN 스크립트 버전) ── -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+  <style>
+    /* 스크롤바 정돈 및 기본 리셋 */
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #000000;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- React 앱이 마운트될 루트 엘리먼트 -->
+  <div id="root"></div>
+
+  <!-- type="text/babel" 설정을 통해 Babel이 자바스크립트를 JSX로 실시간 변환하게 합니다 -->
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    /* ── 디자인 토큰 정의 ── */
+    const C = {
+      bgPage:   "#FFFFFF",
+      headerBg: "#121212",
+      text:     "#18181B",
+      textSub:  "#52525B",
+      textMute: "#A1A1AA",
+      border:   "#E5E7EB",
+    };
+
+    /* ── 하이라이트 스타일 변환 ── */
+    const hlStyles = {
+      yellow: "background: rgba(250,204,21,0.28); border-bottom: 2px solid rgba(234,179,8,0.65); padding: 0 3px; border-radius: 2px;",
+      amber:  "background: rgba(251,146,60,0.2); border-bottom: 2px solid rgba(234,88,12,0.5); padding: 0 3px; border-radius: 2px;",
+      coral:  "border-bottom: 2.5px solid #F87171; padding-bottom: 1px;",
+      green:  "background: rgba(52,211,153,0.18); border-bottom: 2px solid rgba(16,185,129,0.55); padding: 0 3px; border-radius: 2px;",
+      blue:   "border-bottom: 2.5px solid #93C5FD; padding-bottom: 1px;",
+      pink:   "background: rgba(251,113,133,0.15); border-bottom: 2px dashed rgba(244,63,94,0.5); padding: 0 3px; border-radius: 2px;",
+    };
+
+    const processHTML = (text) => {
+      if (!text) return "";
+      return String(text)
+        .replace(/<HL\s+type="([^"]+)">/g, (_, type) => `<span style="${hlStyles[type] || hlStyles.yellow}">`)
+        .replace(/<\/HL>/g, '</span>');
+    };
+
+    /* ── Section Component ── */
+    const Section = ({ label, icon, children }) => (
+      <section style={{ marginBottom: "48px" }}>
+        <h2 style={{ fontSize: "18px", fontWeight: "700", color: C.text, marginBottom: "20px", display: "flex", alignItems: "center", gap: "8px", borderBottom: `1px solid ${C.border}`, paddingBottom: "12px", fontFamily: "sans-serif" }}>
+          <span style={{ fontSize: "20px" }}>{icon}</span><span>{label}</span>
+        </h2>
+        <div>{children}</div>
+      </section>
+    );
+
+    const serif = "'Nanum Myeongjo', 'Apple Myungjo', 'Batang', Georgia, serif";
+    let hasCountedVisit = false;
+
+    /* ── Firebase 초기화 로직 (환경 설정이 제공되지 않으면 오프라인 모드로 안전 동작) ── */
+    let app, auth, db, appId;
+    try {
+      if (typeof __firebase_config !== 'undefined') {
+        const firebaseConfig = JSON.parse(__firebase_config);
+        app = firebase.initializeApp(firebaseConfig);
+        auth = firebase.auth();
+        db = firebase.firestore();
+        appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+      }
+    } catch (e) {
+      console.warn("Firebase Config가 없습니다. 오프라인 모드로 실행합니다.", e);
+    }
+
+    /* ── 메인 App 컴포넌트 ── */
+    function App() {
+      const [qtData, setQtData] = useState(null);
+      const [loading, setLoading] = useState(true);
+      const [error, setError] = useState(null);
+      const [fontScale, setFontScale] = useState(1.1);
+      const [isScrolled, setIsScrolled] = useState(false);
+      
+      const [user, setUser] = useState(null);
+      const [visitors, setVisitors] = useState({ today: 0, total: 0 });
+      const [toast, setToast] = useState({ show: false, message: "" });
+
+      const handleZoomIn = () => setFontScale(prev => Math.min(prev + 0.15, 1.6));
+      const handleZoomOut = () => setFontScale(prev => Math.max(prev - 0.15, 0.8));
+
+      const showToastMessage = (message) => {
+        setToast({ show: true, message });
+        setTimeout(() => setToast({ show: false, message: "" }), 2500);
+      };
+
+      const copyToClipboard = (text, successMsg) => {
+        const textarea = document.createElement("textarea");
+        textarea.value = text;
+        textarea.style.position = "fixed"; 
+        textarea.style.top = "0";
+        textarea.style.left = "0";
+        textarea.style.opacity = "0";
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        try {
+          document.execCommand('copy');
+          showToastMessage(successMsg);
+        } catch (err) {
+          showToastMessage("복사에 실패했습니다. 직접 복사해주세요.");
+        }
+        document.body.removeChild(textarea);
+      };
+
+      /* ── Firebase Auth & 방문자 카운터 ── */
+      useEffect(() => {
+        if (!auth) return;
+        
+        const initAuth = async () => {
+          try {
+            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+              await auth.signInWithCustomToken(__initial_auth_token);
+            } else {
+              await auth.signInAnonymously();
+            }
+          } catch (e) { console.error("Auth Error", e); }
+        };
+        initAuth();
+        return auth.onAuthStateChanged(setUser);
+      }, []);
+
+      useEffect(() => {
+        if (!user || !db || !appId || hasCountedVisit) return;
+        hasCountedVisit = true;
+
+        const recordVisit = async () => {
+          try {
+            const docRef = db.doc(`artifacts/${appId}/public/data/viewStats/counter`);
+            const snap = await docRef.get();
+            
+            const todayStr = new Intl.DateTimeFormat('ko-KR', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit' })
+                             .format(new Date()).replace(/(\. |\.)/g, '-').replace(/-$/, '');
+
+            let newTotal = 1, newToday = 1;
+            if (snap.exists) {
+              const data = snap.data();
+              newTotal = (data.total || 0) + 1;
+              newToday = data.todayDate === todayStr ? (data.today || 0) + 1 : 1;
+            }
+
+            await docRef.set({ total: newTotal, today: newToday, todayDate: todayStr });
+            setVisitors({ today: newToday, total: newTotal });
+          } catch (e) { console.error("Visitor Count Error:", e); }
+        };
+        recordVisit();
+      }, [user]);
+
+      /* ── 스크롤 감지 및 구글 시트 데이터 로드 ── */
+      useEffect(() => {
+        const onScroll = () => setIsScrolled(window.scrollY > 50);
+        window.addEventListener("scroll", onScroll);
+
+        const link = document.createElement("link");
+        link.rel = "stylesheet"; 
+        link.href = "https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&family=Noto+Sans+KR:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap";
+        document.head.appendChild(link);
+
+        const SHEET_ID = "1dH5npAo-c2wnhBRvt50aWKsM5q8lxhcLU7-R37c8_RU";
+        fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`)
+          .then(res => res.text())
+          .then(text => {
+            const data = JSON.parse(text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1));
+            let cols = data.table.cols.map(c => c?.label?.replace(/\s+/g, '') || "");
+            let rows = data.table.rows;
+            
+            if (!cols.some(c => c !== "") && rows.length > 0) {
+              cols = rows[0].c.map(cell => cell?.v ? String(cell.v).replace(/\s+/g, '') : "");
+              rows = rows.slice(1);
+            }
+            
+            if (rows.length === 0) throw new Error("시트가 비어있습니다.");
+
+            const parsedRows = rows.map(r => {
+              const obj = {};
+              cols.forEach((colName, idx) => {
+                if (!colName) return;
+                let val = r.c[idx] ? (r.c[idx].f || r.c[idx].v || "") : "";
+                
+                if (typeof val === 'string') {
+                  if (val.startsWith('Date(')) {
+                    const m = val.match(/Date\((\d+),\s*(\d+),\s*(\d+)/);
+                    if (m) val = `${m[1]}-${String(parseInt(m[2]) + 1).padStart(2, '0')}-${String(m[3]).padStart(2, '0')}`;
+                  } else if (val.match(/^\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\.?$/)) {
+                    val = val.replace(/\s/g, '').replace(/\.$/, '').split('.').map((n, i) => i > 0 ? n.padStart(2, '0') : n).join('-');
+                  }
+                }
+                obj[colName] = val;
+              });
+              return obj;
+            }).filter(r => r["날짜"] || r["Date"] || r["본문내용"]);
+
+            const todayStr = new Intl.DateTimeFormat('ko-KR', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit' })
+                             .format(new Date()).replace(/(\. |\.)/g, '-').replace(/-$/, '');
+            
+            let selectedRow = parsedRows.find(r => (r["날짜"] || r["Date"]) === todayStr);
+            if (!selectedRow) {
+              const pastRows = parsedRows.filter(r => (r["날짜"] || r["Date"]) < todayStr)
+                                         .sort((a, b) => (b["날짜"] || b["Date"]).localeCompare(a["날짜"] || a["Date"]));
+              selectedRow = pastRows.length > 0 ? pastRows[0] : parsedRows[parsedRows.length - 1];
+            }
+            
+            setQtData(selectedRow);
+            setLoading(false);
+          })
+          .catch(err => {
+            console.error(err);
+            setError("데이터를 불러오지 못했습니다.");
+            setLoading(false);
+          });
+
+        return () => { 
+          window.removeEventListener("scroll", onScroll); 
+          try { document.head.removeChild(link); } catch(e){} 
+        };
+      }, []);
+
+      if (loading) {
+        return (
+          <div style={{ background: C.bgPage, height: "100vh", display: "flex", justifyContent: "center", alignItems: "center", fontFamily: serif, color: C.text }}>
+            <div style={{ textAlign: "center" }}><div style={{ fontSize: "28px", marginBottom: "14px" }}>📖</div><div style={{ fontSize: "14px", color: C.textSub, fontFamily: "sans-serif" }}>준비 중...</div></div>
+          </div>
+        );
+      }
+
+      const getVal = (keys, fallback = "") => {
+        if (!qtData) return fallback;
+        const foundKey = keys.find(k => qtData[k] !== undefined && qtData[k] !== null && qtData[k] !== "");
+        return foundKey ? String(qtData[foundKey]) : fallback;
+      };
+
+      const dateStr = getVal(["날짜", "Date"], "");
+      const refStr = getVal(["본문주소", "주소", "Reference"], "오늘의 말씀");
+      const versesText = getVal(["본문내용", "말씀본문", "본문"], "");
+      const medText = getVal(["말씀묵상", "묵상"], "");
+      const prayerText = getVal(["기도", "오늘의기도"], "");
+
+      const baseFontSize = Math.round(18 * fontScale);
+      const verseFontSize = Math.round(20 * fontScale);
+      const verseNumSize = Math.round(16 * fontScale);
+      
+      const dynBodyStyle = { margin: `0 0 ${20 * fontScale}px`, lineHeight: "2", fontSize: `${baseFontSize}px`, color: C.text };
+      const dynVerseStyle = { margin: `0 0 ${18 * fontScale}px`, lineHeight: "2", fontSize: `${verseFontSize}px`, color: C.text };
+      const zoomBtnStyle = { background: "transparent", border: "1px solid rgba(255,255,255,0.2)", color: "#FFFFFF", width: "36px", height: "32px", borderRadius: "6px", display: "flex", justifyContent: "center", alignItems: "center", fontSize: "14px", cursor: "pointer", fontFamily: "sans-serif" };
+
+      const handleShareLink = () => {
+        copyToClipboard(window.location.href, "🔗 큐티 공유 링크가 복사되었습니다!");
+      };
+
+      const handleShareText = () => {
+        const cleanVerses = versesText 
+          ? versesText.replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]*>/g, '').split('\n').map(line => line.trim()).filter(Boolean).join('\n')
+          : "";
+        const cleanMed = medText 
+          ? medText.replace(/<[^>]*>/g, '').split('\n').map(line => line.trim()).filter(Boolean).join('\n\n')
+          : "";
+        const cleanPrayer = prayerText 
+          ? prayerText.replace(/<[^>]*>/g, '').split('\n').map(line => line.trim()).filter(Boolean).join('\n\n')
+          : "";
+
+        const fullShareText = `[루아큐티 · ${dateStr}]
+${refStr}
+
+■ 본문 내용
+${cleanVerses}
+
+■ 말씀 묵상
+${cleanMed}
+
+■ 오늘의 기도
+${cleanPrayer}
+
+* 은혜로운 말씀과 묵상, 루아큐티와 늘 동행하세요.`;
+
+        copyToClipboard(fullShareText, "📝 전체 묵상 텍스트가 복사되었습니다!");
+      };
+
+      const formatText = (text) => {
+        if (!text) return null;
+        return String(text).split('\n').map((line, idx, arr) => {
+          const trimmed = line.trim();
+          if (!trimmed) return <div key={idx} style={{ height: '12px' }} />;
+
+          const isLast = idx === arr.length - 1;
+          let isSubtitle = false;
+          let content = trimmed;
+
+          const subSymbols = ['■', '◼', '▪', '❝', '▶', '✔', '✅', '✦', '★'];
+          const startsWithSymbol = subSymbols.some(symbol => trimmed.startsWith(symbol));
+
+          if (startsWithSymbol) {
+            isSubtitle = true;
+            content = trimmed;
+          } else if (trimmed.startsWith('# ')) {
+            isSubtitle = true;
+            content = trimmed.substring(2).trim();
+          } else if (trimmed.match(/^\[(.*)\]$/)) {
+            isSubtitle = true;
+            content = trimmed;
+          }
+
+          if (isSubtitle) {
+            const subStyle = {
+              margin: idx === 0 ? `0 0 ${8 * fontScale}px` : `${24 * fontScale}px 0 ${10 * fontScale}px`,
+              fontSize: `${baseFontSize * 0.88}px`,
+              color: C.text,
+              fontWeight: "800",
+              letterSpacing: "-0.8px",
+              lineHeight: "1.6"
+            };
+            const mStyle = isLast ? { ...subStyle, marginBottom: 0 } : subStyle;
+            return <div key={idx} style={mStyle} dangerouslySetInnerHTML={{ __html: processHTML(content) }} />;
+          }
+
+          const mStyle = isLast ? { ...dynBodyStyle, margin: 0 } : dynBodyStyle;
+          return <p key={idx} style={mStyle} dangerouslySetInnerHTML={{ __html: processHTML(trimmed) }} />;
+        });
+      };
+
+      const formatVerses = (text) => {
+        if (!text) return <p style={{ color: C.textMute }}>본문 내용이 없습니다.</p>;
+        return <div>{String(text).replace(/<br\s*\/?>/gi, '\n').split('\n').filter(l => l.trim()).map((line, idx) => {
+          const match = line.match(/^\s*(\d+)[절:.\s\|]+(.*)$/);
+          let n = null, content = line;
+          if (match) { n = match[1]; content = match[2]; }
+          const html = n ? `<span style="font-weight: 800; color: #71717A; margin-right: 12px; font-family: sans-serif; font-size: ${verseNumSize}px; display: inline-block; min-width: 18px;">${n}</span>` + processHTML(content) : processHTML(content);
+          return <p key={idx} style={dynVerseStyle} dangerouslySetInnerHTML={{ __html: html }} />;
+        })}</div>;
+      };
+
+      const shareBtnStyle = {
+        flex: 1,
+        background: "#F4F4F5",
+        border: "1px solid #E4E4E7",
+        color: C.text,
+        padding: "14px 16px",
+        borderRadius: "10px",
+        fontSize: "14px",
+        fontWeight: "700",
+        cursor: "pointer",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        gap: "8px",
+        fontFamily: "sans-serif",
+        transition: "all 0.2s ease",
+      };
+
+      return (
+        <div style={{ background: C.bgPage, minHeight: "100vh", color: C.text, fontFamily: serif }}>
+          {error && <div style={{ background: "#FEF2F2", color: "#991B1B", padding: "10px", fontSize: "13px", textAlign: "center", fontFamily: "sans-serif", borderBottom: "1px solid #FCA5A5" }}>⚠️ {error}</div>}
+
+          {/* ══ STICKY HEADER ══ */}
+          <header style={{ position: "sticky", top: 0, zIndex: 100, background: C.headerBg, borderBottom: isScrolled ? "1px solid #27272A" : "none", boxShadow: isScrolled ? "0 4px 12px rgba(0,0,0,0.15)" : "none", transition: "all 0.3s ease" }}>
+            <div style={{ maxWidth: "800px", margin: "0 auto", padding: isScrolled ? "12px 24px" : "40px 24px", transition: "padding 0.3s ease" }}>
+              
+              <div style={{ display: isScrolled ? "none" : "block" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "32px" }}>
+                  <div style={{ display: "flex", alignItems: "baseline", gap: "10px" }}><h1 style={{ margin: 0, fontFamily: "'DM Serif Display', serif", fontSize: "28px", color: "#FFFFFF", fontWeight: "400" }}>RuahQT</h1><span style={{ fontFamily: "sans-serif", fontSize: "12px", color: "#A1A1AA", letterSpacing: "1px" }}>루아큐티</span></div>
+                  <div style={{ display: "flex", gap: "8px" }}>
+                    <button onClick={handleShareLink} style={zoomBtnStyle} title="링크 공유">🔗</button>
+                    <button onClick={handleZoomOut} style={zoomBtnStyle}>A-</button>
+                    <button onClick={handleZoomIn} style={zoomBtnStyle}>A+</button>
+                  </div>
+                </div>
+                <div style={{ width: "32px", height: "1px", background: "#52525B", marginBottom: "20px" }} />
+                <div style={{ display: "flex", alignItems: "baseline", gap: "12px", flexWrap: "wrap" }}>
+                  <div style={{ fontSize: "36px", fontWeight: "800", color: "#FFFFFF", lineHeight: "1.1", letterSpacing: "-1px" }}>{refStr}</div>
+                  <div style={{ fontFamily: "sans-serif", fontSize: "16px", fontWeight: "400", color: "#A1A1AA", letterSpacing: "1px" }}>{dateStr}</div>
+                </div>
+              </div>
+
+              <div style={{ display: isScrolled ? "flex" : "none", justifyContent: "space-between", alignItems: "center" }}>
+                <div style={{ display: "flex", alignItems: "baseline", gap: "8px" }}>
+                  <span style={{ fontSize: "18px", fontWeight: "800", color: "#FFFFFF", letterSpacing: "-0.5px" }}>{refStr}</span>
+                  <span style={{ fontFamily: "sans-serif", fontSize: "13px", fontWeight: "400", color: "#A1A1AA", letterSpacing: "0.5px" }}>{dateStr}</span>
+                </div>
+                <div style={{ display: "flex", gap: "8px" }}>
+                  <button onClick={handleShareLink} style={zoomBtnStyle} title="링크 공유">🔗</button>
+                  <button onClick={handleZoomOut} style={zoomBtnStyle}>A-</button>
+                  <button onClick={handleZoomIn} style={zoomBtnStyle}>A+</button>
+                </div>
+              </div>
+            </div>
+          </header>
+
+          {/* ══ MAIN CONTENT AREA ══ */}
+          <main style={{ maxWidth: "800px", margin: "0 auto", padding: "48px 24px 80px" }}>
+            {versesText && <Section label="본문 내용" icon="📖">{formatVerses(versesText)}</Section>}
+            {medText && <Section label="말씀 묵상" icon="📝">{formatText(medText)}</Section>}
+            {prayerText && (
+              <Section label="오늘의 기도" icon="🙏">
+                <div style={{ background: "#FAFAFA", padding: "32px 32px 40px", borderRadius: "12px", borderLeft: "4px solid #D1D1D6" }}>
+                  {String(prayerText).split('\n').filter(l => l.trim()).map((line, idx) => (
+                    <p key={idx} style={{ margin: `0 0 ${20 * fontScale}px`, fontSize: `${baseFontSize}px`, lineHeight: "2", color: C.text }} dangerouslySetInnerHTML={{ __html: processHTML(line) }} />
+                  ))}
+                </div>
+              </Section>
+            )}
+
+            <div style={{ marginTop: "16px", display: "flex", gap: "12px", flexWrap: "wrap", paddingBottom: "12px" }}>
+              <button onClick={handleShareText} style={shareBtnStyle}>📝 전체 텍스트 복사</button>
+              <button onClick={handleShareLink} style={shareBtnStyle}>🔗 링크 복사</button>
+            </div>
+          </main>
+
+          {/* ── Footer ── */}
+          <footer style={{ background: "#FAFAFA", borderTop: `1px solid ${C.border}` }}>
+            <div style={{ maxWidth: "800px", margin: "0 auto", padding: "40px 24px" }}>
+              <p style={{ fontFamily: "sans-serif", fontSize: "12px", color: C.textMute, lineHeight: "2", margin: 0 }}>
+                <strong style={{ color: C.textSub, display: "block", marginBottom: "8px", fontWeight: "600", letterSpacing: "1px" }}>본문 출처</strong>
+                {refStr} · 개역개정판 © 대한성서공회 허가 사용
+              </p>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "24px", flexWrap: "wrap", gap: "10px" }}>
+                <div style={{ display: "flex", alignItems: "baseline", gap: "8px" }}>
+                  <span style={{ fontFamily: "'DM Serif Display', serif", fontSize: "16px", color: C.textMute }}>RuahQT</span>
+                  <span style={{ fontFamily: "sans-serif", fontSize: "11px", color: "#A1A1AA", letterSpacing: "1px" }}>루아큐티</span>
+                </div>
+                {visitors.total > 0 && (
+                  <div style={{ fontFamily: "sans-serif", fontSize: "11px", color: C.textMute, background: "#F4F4F5", padding: "4px 10px", borderRadius: "4px" }}>
+                    오늘 <span style={{ fontWeight: "700", color: C.textSub }}>{visitors.today}</span> / 
+                    전체 <span style={{ fontWeight: "700", color: C.textSub }}>{visitors.total}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </footer>
+
+          {/* ══ 토스트 알림 ══ */}
+          {toast.show && (
+            <div style={{
+              position: "fixed",
+              bottom: "32px",
+              left: "50%",
+              transform: "translateX(-50%)",
+              background: "#18181B",
+              color: "#FFFFFF",
+              padding: "12px 24px",
+              borderRadius: "30px",
+              fontSize: "14px",
+              fontWeight: "600",
+              fontFamily: "sans-serif",
+              boxShadow: "0 10px 25px rgba(0,0,0,0.25)",
+              zIndex: 9999,
+              whiteSpace: "nowrap",
+              transition: "opacity 0.2s ease",
+            }}>
+              {toast.message}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // React 18 렌더링 방식 적용
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
