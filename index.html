@@ -94,7 +94,6 @@
       const [qtData, setQtData] = useState(null);
       const [loading, setLoading] = useState(true);
       const [error, setError] = useState(null);
-      // 요청하신 정확한 픽셀 크기가 기본 적용되도록 기준 배율을 1.0으로 설정합니다.
       const [fontScale, setFontScale] = useState(1.0);
       const [isScrolled, setIsScrolled] = useState(false);
       
@@ -174,8 +173,8 @@
 
       /* ── 스크롤 감지 및 구글 시트 데이터 로드 ── */
       useEffect(() => {
-        // 첫 번째 스크롤 시도가 발생하자마자(20px 이상) 신속하게 축소창이 활성화되도록 임계값을 낮춥니다.
-        const onScroll = () => setIsScrolled(window.scrollY > 20);
+        // 대형 헤더 영역(약 180px)이 화면에서 스크롤되어 사라질 즈음 축소 고정창이 내려오도록 설정합니다.
+        const onScroll = () => setIsScrolled(window.scrollY > 150);
         window.addEventListener("scroll", onScroll);
 
         const link = document.createElement("link");
@@ -262,7 +261,6 @@
       const medText = getVal(["말씀묵상", "묵상"], "");
       const prayerText = getVal(["기도", "오늘의기도"], "");
 
-      // 요청하신 정확한 폰트 크기 매핑 (base multiplier 조정)
       const baseFontSize = Math.round(18 * fontScale);   // 말씀묵상 & 기도문: 기본 18px
       const verseFontSize = Math.round(16 * fontScale);  // 성경말씀 본문: 기본 16px
       const verseNumSize = Math.round(12 * fontScale);   // 본문내용 절수표시: 기본 12px
@@ -378,8 +376,8 @@ ${cleanPrayer}
         <div style={{ background: C.bgPage, minHeight: "100vh", color: C.text, fontFamily: serif }}>
           {error && <div style={{ background: "#FEF2F2", color: "#991B1B", padding: "10px", fontSize: "13px", textAlign: "center", fontFamily: "sans-serif", borderBottom: "1px solid #FCA5A5" }}>⚠️ {error}</div>}
 
-          {/* ══ STICKY HEADER ══ */}
-          {/* position: fixed로 변경하여 아래 본문 텍스트 스크롤에 아무런 물리적 영향(흔들림)을 주지 않도록 격리했습니다 */}
+          {/* ══ [신규] PERSISTENT COMPACT HEADER (스크롤용 슬라이딩 고정 상단창) ══ */}
+          {/* 평소에는 위로 올라가 숨겨져 있으며, 스크롤 150px 이상 도달 시 부드럽게 미끄러지듯 내려옵니다 */}
           <header style={{ 
             position: "fixed", 
             top: 0, 
@@ -387,63 +385,43 @@ ${cleanPrayer}
             right: 0,
             zIndex: 100, 
             background: C.headerBg, 
-            borderBottom: isScrolled ? "1px solid #27272A" : "none", 
-            boxShadow: isScrolled ? "0 4px 12px rgba(0,0,0,0.15)" : "none", 
-            transition: "height 0.28s cubic-bezier(0.4, 0, 0.2, 1), border-bottom 0.28s ease, box-shadow 0.28s ease",
-            height: isScrolled ? "76px" : "180px",
+            borderBottom: "1px solid #27272A", 
+            boxShadow: "0 4px 12px rgba(0,0,0,0.15)", 
+            height: "76px",
+            transform: isScrolled ? "translateY(0)" : "translateY(-100%)",
+            opacity: isScrolled ? 1 : 0,
+            transition: "transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.22s ease",
+            pointerEvents: isScrolled ? "auto" : "none",
             overflow: "hidden"
           }}>
             <div style={{ 
               maxWidth: "800px", 
               margin: "0 auto", 
               height: "100%",
-              position: "relative" // 내부 절대좌표 요소를 감싸기 위한 기준점
+              padding: "0 24px",
+              display: "flex", 
+              justifyContent: "space-between", 
+              alignItems: "center" 
             }}>
-              
-              {/* 1. 확장 모드 (스크롤 전 기본 노출) */}
-              <div style={{ 
-                position: "absolute",
-                top: "32px",
-                left: "24px",
-                right: "24px",
-                opacity: isScrolled ? 0 : 1,
-                transform: isScrolled ? "scale(0.96) translateY(-12px)" : "scale(1) translateY(0)",
-                transition: "opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
-                pointerEvents: isScrolled ? "none" : "auto"
-              }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "32px" }}>
-                  <div style={{ display: "flex", alignItems: "baseline", gap: "10px" }}><h1 style={{ margin: 0, fontFamily: "'DM Serif Display', serif", fontSize: "28px", color: "#FFFFFF", fontWeight: "400" }}>RuahQT</h1><span style={{ fontFamily: "sans-serif", fontSize: "12px", color: "#A1A1AA", letterSpacing: "1px" }}>루아큐티</span></div>
-                  <div style={{ display: "flex", gap: "8px" }}>
-                    <button onClick={handleShareLink} style={zoomBtnStyle} title="링크 공유">🔗</button>
-                    <button onClick={handleZoomOut} style={zoomBtnStyle}>A-</button>
-                    <button onClick={handleZoomIn} style={zoomBtnStyle}>A+</button>
-                  </div>
-                </div>
-                <div style={{ width: "32px", height: "1px", background: "#52525B", marginBottom: "20px" }} />
-                <div style={{ display: "flex", alignItems: "baseline", gap: "12px", flexWrap: "wrap" }}>
-                  <div style={{ fontSize: "36px", fontWeight: "800", color: "#FFFFFF", lineHeight: "1.1", letterSpacing: "-1px" }}>{refStr}</div>
-                  <div style={{ fontFamily: "sans-serif", fontSize: "16px", fontWeight: "400", color: "#A1A1AA", letterSpacing: "1px" }}>{dateStr}</div>
-                </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+                <span style={{ fontSize: "18px", fontWeight: "800", color: "#FFFFFF", letterSpacing: "-0.5px", lineHeight: "1.2" }}>{refStr}</span>
+                <span style={{ fontFamily: "sans-serif", fontSize: "12px", fontWeight: "400", color: "#A1A1AA", letterSpacing: "0.5px" }}>{dateStr}</span>
               </div>
+              <div style={{ display: "flex", gap: "8px" }}>
+                <button onClick={handleShareLink} style={zoomBtnStyle} title="링크 공유">🔗</button>
+                <button onClick={handleZoomOut} style={zoomBtnStyle}>A-</button>
+                <button onClick={handleZoomIn} style={zoomBtnStyle}>A+</button>
+              </div>
+            </div>
+          </header>
 
-              {/* 2. 축소 모드 (스크롤 후 노출) */}
-              {/* 절대 배치 및 상하 중앙정렬(translateY(-50%))을 통해 레이아웃 겹침을 완벽히 방지합니다 */}
-              <div style={{ 
-                position: "absolute",
-                top: "50%",
-                left: "24px",
-                right: "24px",
-                transform: isScrolled ? "translateY(-50%) scale(1)" : "translateY(-30%) scale(0.96)",
-                opacity: isScrolled ? 1 : 0,
-                transition: "opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
-                pointerEvents: isScrolled ? "auto" : "none",
-                display: "flex", 
-                justifyContent: "space-between", 
-                alignItems: "center" 
-              }}>
-                <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-                  <span style={{ fontSize: "18px", fontWeight: "800", color: "#FFFFFF", letterSpacing: "-0.5px", lineHeight: "1.2" }}>{refStr}</span>
-                  <span style={{ fontFamily: "sans-serif", fontSize: "12px", fontWeight: "400", color: "#A1A1AA", letterSpacing: "0.5px" }}>{dateStr}</span>
+          {/* ══ [신규] STATIC MAIN HEADER (본문에 완전히 붙어서 자연스럽게 움직이는 정적 대형 상단창) ══ */}
+          <div style={{ background: C.headerBg, padding: "40px 24px" }}>
+            <div style={{ maxWidth: "800px", margin: "0 auto" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "32px" }}>
+                <div style={{ display: "flex", alignItems: "baseline", gap: "10px" }}>
+                  <h1 style={{ margin: 0, fontFamily: "'DM Serif Display', serif", fontSize: "28px", color: "#FFFFFF", fontWeight: "400" }}>RuahQT</h1>
+                  <span style={{ fontFamily: "sans-serif", fontSize: "12px", color: "#A1A1AA", letterSpacing: "1px" }}>루아큐티</span>
                 </div>
                 <div style={{ display: "flex", gap: "8px" }}>
                   <button onClick={handleShareLink} style={zoomBtnStyle} title="링크 공유">🔗</button>
@@ -451,15 +429,16 @@ ${cleanPrayer}
                   <button onClick={handleZoomIn} style={zoomBtnStyle}>A+</button>
                 </div>
               </div>
-
+              <div style={{ width: "32px", height: "1px", background: "#52525B", marginBottom: "20px" }} />
+              <div style={{ display: "flex", alignItems: "baseline", gap: "12px", flexWrap: "wrap" }}>
+                <div style={{ fontSize: "36px", fontWeight: "800", color: "#FFFFFF", lineHeight: "1.1", letterSpacing: "-1px" }}>{refStr}</div>
+                <div style={{ fontFamily: "sans-serif", fontSize: "16px", fontWeight: "400", color: "#A1A1AA", letterSpacing: "1px" }}>{dateStr}</div>
+              </div>
             </div>
-          </header>
-
-          {/* ══ HEADER SPACER ══ */}
-          {/* fixed 헤더가 본문 첫 영역을 가리지 않도록 고정 높이의 여백 공간을 배치합니다 */}
-          <div style={{ height: "180px" }} />
+          </div>
 
           {/* ══ MAIN CONTENT AREA ══ */}
+          {/* Spacer를 없애고 헤더 밑으로 자연스럽게 이어지도록 설계했습니다 */}
           <main style={{ maxWidth: "800px", margin: "0 auto", padding: "48px 24px 80px" }}>
             {versesText && <Section label="본문 내용" icon="📖">{formatVerses(versesText)}</Section>}
             {medText && <Section label="말씀 묵상" icon="📝">{formatText(medText)}</Section>}
