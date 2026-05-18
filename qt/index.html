@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <meta name="description" content="RuahQT 루아큐티 · 2026.05.18 · 성령과 함께 걷는 자유의 길" />
+  <title>RuahQT · 2026.05.18</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&family=Noto+Sans+KR:wght@300;400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --text:       #18181B;
+      --text-sub:   #52525B;
+      --text-mute:  #A1A1AA;
+      --label:      #71717A;
+      --border:     #E4E4E7;
+      --bg-page:    #F2F2F7;
+      --bg-card:    #FFFFFF;
+      --bg-section: #FAFAFA;
+      --accent:     #3F3F46;
+      --header-bg:  #18181B;
+    }
+
+    body {
+      background: var(--bg-page);
+      font-family: 'Nanum Myeongjo', 'Apple Myungjo', 'Batang', Georgia, serif;
+      color: var(--text);
+      min-height: 100vh;
+    }
+    .page { max-width: 430px; margin: 0 auto; }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       형광펜 / 색연필 하이라이트 스타일
+       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+    /* 노란 형광펜 — **[텍스트]** */
+    mark.hl-yellow {
+      background: linear-gradient(
+        transparent 0%,
+        transparent 30%,
+        rgba(250, 210, 30, 0.55) 30%,
+        rgba(250, 210, 30, 0.55) 85%,
+        transparent 85%
+      );
+      padding: 0 2px;
+      border-radius: 1px;
+      color: inherit;
+      /* 형광펜 특유의 살짝 삐져나온 느낌 */
+      box-decoration-break: clone;
+      -webkit-box-decoration-break: clone;
+    }
+
+    /* 색연필 밑줄 (coral) — *[텍스트]* */
+    .hl-coral {
+      border-bottom: 2.5px solid rgba(239, 97, 85, 0.75);
+      padding-bottom: 1px;
+      /* 색연필 특유의 약간 불규칙한 느낌은 box-shadow 로 */
+    }
+
+    /* 백틱 인라인 강조 */
+    .hl-inline {
+      background: rgba(63, 63, 70, 0.08);
+      border-radius: 4px;
+      padding: 1px 5px;
+      font-size: 0.93em;
+      font-family: 'Noto Sans KR', sans-serif;
+      color: var(--accent);
+    }
+
+    /* 핵심 구절 블록 전용 — 인용문 안의 강조 */
+    .keyverse-box mark.hl-yellow {
+      background: linear-gradient(
+        transparent 0%,
+        transparent 25%,
+        rgba(255, 230, 60, 0.45) 25%,
+        rgba(255, 230, 60, 0.45) 88%,
+        transparent 88%
+      );
+    }
+
+    /* 기도문 안의 형광펜은 조금 더 밝고 부드럽게 */
+    .prayer-body mark.hl-yellow {
+      background: linear-gradient(
+        transparent 0%,
+        transparent 30%,
+        rgba(255, 220, 50, 0.35) 30%,
+        rgba(255, 220, 50, 0.35) 88%,
+        transparent 88%
+      );
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       HEADER
+       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    .header {
+      background: var(--header-bg);
+      padding: 36px 24px 28px;
+      position: relative;
+    }
+    .brand {
+      display: flex; align-items: baseline; gap: 10px; margin-bottom: 22px;
+    }
+    .brand-main {
+      font-family: 'DM Serif Display', serif;
+      font-size: 28px; font-weight: 400;
+      color: #FFF; letter-spacing: -0.5px;
+    }
+    .brand-sub {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 13px; color: #71717A; letter-spacing: 1px;
+    }
+    .header-divider { width: 32px; height: 1px; background: #52525B; margin-bottom: 20px; }
+    .header-date {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 11px; color: #71717A; letter-spacing: 2px; margin-bottom: 10px;
+    }
+    .header-title {
+      font-size: 24px; font-weight: 800; color: #FFF;
+      line-height: 1.5; margin-bottom: 14px;
+    }
+    .header-ref {
+      display: inline-block;
+      border: 1px solid #3F3F46; border-radius: 20px; padding: 5px 16px;
+    }
+    .header-ref span {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 12px; color: #A1A1AA; letter-spacing: 0.5px;
+    }
+    .corner { position: absolute; width: 28px; height: 28px; }
+    .corner-tr { top:20px; right:22px; border-top:1.5px solid #3F3F46; border-right:1.5px solid #3F3F46; }
+    .corner-br { bottom:20px; right:22px; border-bottom:1.5px solid #3F3F46; border-right:1.5px solid #3F3F46; }
+    .header-accent { height: 3px; background: #3F3F46; }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       CONTENT AREA
+       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    .content { padding: 16px 14px 40px; }
+
+    /* ── 섹션 카드 ── */
+    .card {
+      margin-bottom: 10px;
+      background: var(--bg-card);
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .card-head {
+      display: flex; align-items: center; gap: 9px;
+      padding: 13px 18px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-section);
+    }
+    .card-head-dark {
+      background: var(--header-bg);
+      border-bottom: 1px solid #3F3F46;
+    }
+    .card-icon { font-size: 15px; }
+    .card-label {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 2px; color: var(--label);
+      text-transform: uppercase;
+    }
+    .card-body { padding: 18px 18px 20px; }
+
+    /* ── 절 번호 배지 ── */
+    .vnum {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 20px; height: 20px;
+      background: #3F3F46; color: #FFF;
+      border-radius: 5px; font-size: 11px; font-weight: 600;
+      font-family: 'Noto Sans KR', sans-serif;
+      margin-right: 10px; flex-shrink: 0; margin-top: 4px;
+    }
+    .verse-row { display: flex; align-items: flex-start; margin-bottom: 18px; }
+    .verse-row:last-child { margin-bottom: 0; }
+    .verse-text { margin:0; line-height:2; font-size:16px; flex:1; }
+
+    /* ── 핵심 구절 박스 ── */
+    .keyverse-box {
+      background: linear-gradient(135deg, #1C1C1E 0%, #2A2A2E 100%);
+      border: 1px solid #3F3F46;
+      border-radius: 10px;
+      padding: 18px 20px;
+      margin-bottom: 18px;
+      position: relative;
+      overflow: hidden;
+    }
+    .keyverse-box::before {
+      content: '❝';
+      position: absolute; top: 10px; left: 14px;
+      font-size: 40px; color: rgba(255,255,255,0.06);
+      font-family: Georgia, serif; line-height: 1;
+    }
+    .keyverse-text {
+      font-size: 15.5px; line-height: 2;
+      color: #E4E4E7; margin: 0;
+      position: relative; z-index: 1;
+    }
+
+    /* ── 묵상 섹션 ── */
+    .section-block { margin-bottom: 22px; }
+    .section-block:last-child { margin-bottom: 0; }
+
+    .section-tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 10px; font-weight: 600;
+      letter-spacing: 1.5px; color: var(--label);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .section-tag::before {
+      content: ''; display: block;
+      width: 3px; height: 12px;
+      background: #3F3F46; border-radius: 2px;
+    }
+
+    /* 배경 섹션 */
+    .section-background .section-tag::before { background: #6B7280; }
+
+    /* 말씀 깊이 보기 */
+    .section-insight .section-tag::before { background: #3F3F46; }
+
+    /* 오늘을 살아내며 — 핵심 섹션이므로 강조 */
+    .section-today {
+      background: #FAFAFA;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      padding: 16px;
+    }
+    .section-today .section-tag::before { background: #1D4ED8; }
+    .section-today .section-tag { color: #1D4ED8; }
+
+    /* 오늘의 실천 */
+    .practice-box {
+      background: #F9F9F9;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      border-left: 3px solid #3F3F46;
+      padding: 14px 16px;
+      margin-bottom: 0;
+    }
+    .practice-label {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 10px; font-weight: 600;
+      letter-spacing: 2px; color: var(--text-mute);
+      margin-bottom: 8px;
+    }
+    .practice-text {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 13.5px; line-height: 1.9;
+      color: var(--text-sub); margin: 0;
+    }
+
+    /* 본문 문단 */
+    .body-p {
+      margin: 0 0 14px; line-height: 2; font-size: 15.5px; color: var(--text);
+    }
+    .body-p:last-child { margin: 0; }
+
+    /* ── 기도 섹션 ── */
+    .prayer-section {
+      background: var(--header-bg);
+      border-radius: 14px; overflow: hidden;
+      border: 1px solid var(--border);
+      margin-bottom: 10px;
+    }
+    .prayer-cross { text-align: center; margin-bottom: 20px; }
+    .prayer-cross-wrap { display: inline-block; position: relative; width: 20px; height: 24px; }
+    .prayer-cross-v {
+      position: absolute; top:0; left:50%; transform:translateX(-50%);
+      width:2px; height:24px; background:#52525B; border-radius:2px;
+    }
+    .prayer-cross-h {
+      position: absolute; top:8px; left:0;
+      width:20px; height:2px; background:#52525B; border-radius:2px;
+    }
+    .prayer-greeting {
+      margin: 0 0 18px; font-size:16px; line-height:2.1;
+      color:#E4E4E7; text-align:center;
+    }
+    .prayer-body .body-p { color: #D4D4D8; }
+    .prayer-body .body-p:last-child { margin-bottom: 24px; }
+    .prayer-close {
+      text-align: center;
+      border-top: 1px solid #3F3F46;
+      padding-top: 18px;
+    }
+    .prayer-close-text {
+      margin:0; font-size:15px; color:#A1A1AA;
+      font-style:italic; letter-spacing:0.5px;
+    }
+    .prayer-amen {
+      margin:6px 0 0; font-size:18px; font-weight:700;
+      color:#FFF; letter-spacing:2px;
+    }
+
+    /* ── 푸터 ── */
+    .footer { margin-top: 28px; padding: 0 4px; }
+    .footer-inner { border-top: 1px solid var(--border); padding-top: 18px; }
+    .footer-source {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 10px; color: var(--text-mute); line-height: 1.9; margin: 0;
+    }
+    .footer-source-label {
+      display: block; font-weight: 600; color: var(--label);
+      margin-bottom: 4px; letter-spacing: 1px;
+    }
+    .footer-brand {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 10px; color: #D1D1D6;
+      margin: 12px 0 0; letter-spacing: 1px; text-align: right;
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ══ HEADER ══ -->
+  <header class="header">
+    <div class="brand">
+      <span class="brand-main">RuahQT</span>
+      <span class="brand-sub">루아큐티</span>
+    </div>
+    <div class="header-divider"></div>
+    <div class="header-date">2026.05.18 · 날마다 솟는 샘물</div>
+    <div class="header-title">성령과 함께 걷는 자유의 길</div>
+    <div class="header-ref"><span>갈라디아서 5:16-25</span></div>
+    <div class="corner corner-tr"></div>
+    <div class="corner corner-br"></div>
+  </header>
+  <div class="header-accent"></div>
+
+  <!-- ══ CONTENT ══ -->
+  <main class="content">
+
+    <!-- ── 말씀 본문 ── -->
+    <div class="card">
+      <div class="card-head">
+        <span class="card-icon">📖</span>
+        <span class="card-label">말씀 본문</span>
+      </div>
+      <div class="card-body">
+        
+        <div class="verse-row">
+          <span class="vnum">16</span>
+          <p class="verse-text">내가 이르노니 너희는 성령을 따라 행하라 그리하면 육체의 욕심을 이루지 아니하리라</p>
+        </div>
+        
+        <div class="verse-row">
+          <span class="vnum">17</span>
+          <p class="verse-text">육체의 소욕은 성령을 거스르고 성령은 육체를 거스르나니</p>
+        </div>
+        
+        <div class="verse-row">
+          <span class="vnum">22</span>
+          <p class="verse-text">오직 성령의 열매는 사랑과 희락과 화평과 오래 참음과 자비와 양선과 충성과</p>
+        </div>
+        
+        <div class="verse-row">
+          <span class="vnum">23</span>
+          <p class="verse-text">온유와 절제니 이같은 것을 금지할 법이 없느니라</p>
+        </div>
+        
+        <div class="verse-row">
+          <span class="vnum">25</span>
+          <p class="verse-text">만일 우리가 성령으로 살면 또한 성령으로 행할지니</p>
+        </div>
+        
+      </div>
+    </div>
+
+    <!-- ── 말씀 묵상 ── -->
+    <div class="card">
+      <div class="card-head">
+        <span class="card-icon">📝</span>
+        <span class="card-label">말씀 묵상</span>
+      </div>
+      <div class="card-body">
+        
+
+          
+          <!-- 핵심 구절 -->
+          <div class="keyverse-box">
+            <p class="keyverse-text">'내가 이르노니 너희는 성령을 따라 행하라 그리하면 육체의 욕심을 이루지 아니하리라 (갈라디아서 5:16)'</p>
+          </div>
+
+          
+        
+
+          
+          <!-- 배경 / 말씀 깊이 보기 / 기타 -->
+          <div class="section-block section-background">
+            
+            <div class="section-tag">배경</div>
+            
+            <p class="body-p">바울은 갈라디아 교인들에게 그리스도 안에서 얻은 참된 자유가 무엇인지 설명합니다.</p>
+          </div>
+
+          
+        
+
+          
+          <!-- 배경 / 말씀 깊이 보기 / 기타 -->
+          <div class="section-block section-insight">
+            
+            <div class="section-tag">말씀 깊이 보기</div>
+            
+            <p class="body-p">본문에서 행하라는 단어는 헬라어 문맥상 계속해서 걷다라는 의미를 담고 있습니다.</p>
+          </div>
+
+          
+        
+
+          
+          <!-- 오늘을 살아내며 -->
+          <div class="section-block section-today">
+            <div class="section-tag">오늘을 살아내며</div>
+            <p class="body-p">오늘도 우리는 선택의 기로에서 갈등을 경험합니다. <mark class="hl-yellow">내 의지의 힘을 빼고 성령님의 음성에 귀를 기울일 때, 참된 평안을 누릴 수 있습니다.</mark> 지친 마음을 주님께 맡겨보세요.</p>
+          </div>
+
+          
+        
+
+          
+          <!-- 오늘의 실천 -->
+          <div class="practice-box">
+            <p class="practice-label">✔ 오늘의 실천</p>
+            <p class="practice-text">마음이 조급해질 때 '성령님, 지금 제 마음을 다스려 주세요'라고 기도하세요.</p>
+          </div>
+
+          
+        
+      </div>
+    </div>
+
+    <!-- ── 오늘의 기도 ── -->
+    <div class="prayer-section">
+      <div class="card-head card-head-dark">
+        <span class="card-icon">🙏</span>
+        <span class="card-label">오늘의 기도</span>
+      </div>
+      <div class="card-body">
+        <div class="prayer-cross">
+          <div class="prayer-cross-wrap">
+            <div class="prayer-cross-v"></div>
+            <div class="prayer-cross-h"></div>
+          </div>
+        </div>
+        <p class="prayer-greeting">사랑의 주님,</p>
+        <div class="prayer-body">
+          
+          <p class="body-p">사랑의 주님, <mark class="hl-yellow">오늘 하루가 주님이 맺으시는 성령의 열매로 가득하기를 소망합니다.</mark> 예수님의 이름으로 기도합니다. 아멘.</p>
+          
+        </div>
+        <div class="prayer-close">
+          <p class="prayer-close-text">예수님의 이름으로 기도합니다.</p>
+          <p class="prayer-amen">아 멘</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 푸터 ── -->
+    <footer class="footer">
+      <div class="footer-inner">
+        <p class="footer-source">
+          <span class="footer-source-label">본문 출처</span>
+          갈라디아서 5:16-25 · 성경전서 개역개정판<br />
+          © 재단법인 대한성서공회 허가 사용
+        </p>
+        <p class="footer-brand">RuahQT 루아큐티</p>
+      </div>
+    </footer>
+
+  </main>
+</div>
+</body>
+</html>
