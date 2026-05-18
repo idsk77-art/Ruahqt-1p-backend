@@ -94,7 +94,8 @@
       const [qtData, setQtData] = useState(null);
       const [loading, setLoading] = useState(true);
       const [error, setError] = useState(null);
-      const [fontScale, setFontScale] = useState(1.1);
+      // 요청하신 정확한 픽셀 크기가 기본 적용되도록 기준 배율을 1.0으로 설정합니다.
+      const [fontScale, setFontScale] = useState(1.0);
       const [isScrolled, setIsScrolled] = useState(false);
       
       const [user, setUser] = useState(null);
@@ -260,9 +261,10 @@
       const medText = getVal(["말씀묵상", "묵상"], "");
       const prayerText = getVal(["기도", "오늘의기도"], "");
 
-      const baseFontSize = Math.round(18 * fontScale);
-      const verseFontSize = Math.round(20 * fontScale);
-      const verseNumSize = Math.round(16 * fontScale);
+      // 요청하신 정확한 폰트 크기 매핑 (base multiplier 조정)
+      const baseFontSize = Math.round(18 * fontScale);   // 말씀묵상 & 기도문: 기본 18px
+      const verseFontSize = Math.round(16 * fontScale);  // 성경말씀 본문: 기본 16px
+      const verseNumSize = Math.round(12 * fontScale);   // 본문내용 절수표시: 기본 12px
       
       const dynBodyStyle = { margin: `0 0 ${20 * fontScale}px`, lineHeight: "2", fontSize: `${baseFontSize}px`, color: C.text };
       const dynVerseStyle = { margin: `0 0 ${18 * fontScale}px`, lineHeight: "2", fontSize: `${verseFontSize}px`, color: C.text };
@@ -395,10 +397,11 @@ ${cleanPrayer}
                 </div>
               </div>
 
+              {/* 축소 모드 (스크롤 후) - 성경주소와 날짜에 세로 줄바꿈(flex-direction: column)을 적용해 컴팩트하게 구성 */}
               <div style={{ display: isScrolled ? "flex" : "none", justifyContent: "space-between", alignItems: "center" }}>
-                <div style={{ display: "flex", alignItems: "baseline", gap: "8px" }}>
-                  <span style={{ fontSize: "18px", fontWeight: "800", color: "#FFFFFF", letterSpacing: "-0.5px" }}>{refStr}</span>
-                  <span style={{ fontFamily: "sans-serif", fontSize: "13px", fontWeight: "400", color: "#A1A1AA", letterSpacing: "0.5px" }}>{dateStr}</span>
+                <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+                  <span style={{ fontSize: "18px", fontWeight: "800", color: "#FFFFFF", letterSpacing: "-0.5px", lineHeight: "1.2" }}>{refStr}</span>
+                  <span style={{ fontFamily: "sans-serif", fontSize: "12px", fontWeight: "400", color: "#A1A1AA", letterSpacing: "0.5px" }}>{dateStr}</span>
                 </div>
                 <div style={{ display: "flex", gap: "8px" }}>
                   <button onClick={handleShareLink} style={zoomBtnStyle} title="링크 공유">🔗</button>
