@@ -174,7 +174,8 @@
 
       /* ── 스크롤 감지 및 구글 시트 데이터 로드 ── */
       useEffect(() => {
-        const onScroll = () => setIsScrolled(window.scrollY > 60);
+        // 첫 번째 스크롤 시도가 발생하자마자(20px 이상) 신속하게 축소창이 활성화되도록 임계값을 낮춥니다.
+        const onScroll = () => setIsScrolled(window.scrollY > 20);
         window.addEventListener("scroll", onScroll);
 
         const link = document.createElement("link");
@@ -378,10 +379,12 @@ ${cleanPrayer}
           {error && <div style={{ background: "#FEF2F2", color: "#991B1B", padding: "10px", fontSize: "13px", textAlign: "center", fontFamily: "sans-serif", borderBottom: "1px solid #FCA5A5" }}>⚠️ {error}</div>}
 
           {/* ══ STICKY HEADER ══ */}
-          {/* 높이 자체를 CSS Transition으로 부드럽게 제어합니다 */}
+          {/* position: fixed로 변경하여 아래 본문 텍스트 스크롤에 아무런 물리적 영향(흔들림)을 주지 않도록 격리했습니다 */}
           <header style={{ 
-            position: "sticky", 
+            position: "fixed", 
             top: 0, 
+            left: 0,
+            right: 0,
             zIndex: 100, 
             background: C.headerBg, 
             borderBottom: isScrolled ? "1px solid #27272A" : "none", 
@@ -451,6 +454,10 @@ ${cleanPrayer}
 
             </div>
           </header>
+
+          {/* ══ HEADER SPACER ══ */}
+          {/* fixed 헤더가 본문 첫 영역을 가리지 않도록 고정 높이의 여백 공간을 배치합니다 */}
+          <div style={{ height: "180px" }} />
 
           {/* ══ MAIN CONTENT AREA ══ */}
           <main style={{ maxWidth: "800px", margin: "0 auto", padding: "48px 24px 80px" }}>
