@@ -61,6 +61,11 @@ select{font-family:'Noto Sans KR',sans-serif;font-size:0.76rem;border:1px solid 
 .btn-sm.on{background:var(--dune);border-color:var(--taupe);color:var(--umber);}
 .feedback{font-size:0.78rem;min-height:18px;color:var(--text-light);text-align:center;}
 .feedback.ok{color:#5a8048;}.feedback.err{color:#a04030;}
+/* ── 절별 줄 표시 ── */
+.verse-lines{display:flex;flex-direction:column;gap:6px;margin-bottom:20px;}
+.verse-line{display:flex;align-items:baseline;gap:10px;line-height:1.9;}
+.verse-num{font-size:0.68rem;color:var(--taupe-mid);font-weight:400;min-width:18px;text-align:right;flex-shrink:0;letter-spacing:0.02em;padding-top:2px;}
+.verse-body{font-size:clamp(1rem,2.8vw,1.12rem);color:var(--text-dark);word-break:keep-all;flex:1;}
 </style>
 </head>
 <body>
@@ -110,13 +115,10 @@ select{font-family:'Noto Sans KR',sans-serif;font-size:0.76rem;border:1px solid 
 <script>
 /* ================================================================
    RuahVerse — 말씀 암송 앱
-   구글시트: https://docs.google.com/spreadsheets/d/1pXcGIfEUxj2iP7TaN-TA-d4437LINxG1h0X1sfAq8bY
-   [디버깅 확인된 gviz 실제 구조]
-     parsedNumHeaders = 0  → rows[0] 이 헤더행, 직접 건너뜀
-     col[0] = 성경구절 (A열)
-     col[1] = 말씀     (B열)
-     col[2] = 구분     (C열, 구약/신약)
-   총 168 rows = 헤더 1 + 데이터 167
+   [gviz 실제 구조 - 디버깅 확인]
+     parsedNumHeaders = 0  → rows[0] 헤더행, 직접 건너뜀
+     col[0] = 성경구절(A열), col[1] = 말씀(B열), col[2] = 구분(C열)
+     총 168 rows = 헤더 1 + 데이터 167
 ================================================================ */
 
 var SHEET_ID = "1pXcGIfEUxj2iP7TaN-TA-d4437LINxG1h0X1sfAq8bY";
@@ -142,12 +144,7 @@ function rand(n){return Math.floor(Math.random()*n);}
 function storeKey(){var d=new Date();return "rv_"+d.getFullYear()+(d.getMonth()+1)+d.getDate();}
 function blankSeed(){var d=new Date();return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();}
 
-/* ================================================================
-   parseGviz
-   - indexOf/lastIndexOf 로 JSON 추출 (정규식 이스케이프 문제 없음)
-   - rows[0] 은 헤더행 → i===0 에서 continue 로 건너뜀
-   - col[0] = 성경구절, col[1] = 말씀  (실제 gviz 응답 직접 확인)
-================================================================ */
+/* ── gviz 파서 ── */
 function parseGviz(raw){
   var res=[];
   try{
@@ -155,23 +152,50 @@ function parseGviz(raw){
     if(s<0||e<0) throw new Error("gviz bracket not found");
     var data=JSON.parse(raw.slice(s+1,e));
     var rows=data.table.rows;
-    console.log("[RuahVerse] gviz rows:", rows.length, "parsedNumHeaders:", data.table.parsedNumHeaders);
+    console.log("[RuahVerse] gviz rows:", rows.length, "/ parsedNumHeaders:", data.table.parsedNumHeaders);
     for(var i=0;i<rows.length;i++){
-      if(i===0) continue;           /* rows[0] = 헤더행("성경구절","말씀","구분") 건너뜀 */
+      if(i===0) continue;           /* rows[0] = 헤더행 건너뜀 */
       var row=rows[i];
       if(!row||!row.c) continue;
-      var ref=(row.c[0]&&row.c[0].v!=null)?String(row.c[0].v).trim():""; /* A열 = 성경구절 */
-      var t  =(row.c[1]&&row.c[1].v!=null)?String(row.c[1].v).trim():""; /* B열 = 말씀 */
+      var ref=(row.c[0]&&row.c[0].v!=null)?String(row.c[0].v).trim():"";
+      var t  =(row.c[1]&&row.c[1].v!=null)?String(row.c[1].v).trim():"";
       /* 앞 절번호 제거: "27 하나님이..." → "하나님이..." */
       var sp=t.indexOf(" ");
       if(sp>0&&sp<=3&&!isNaN(t.slice(0,sp))) t=t.slice(sp+1);
       if(ref&&t) res.push({ref:ref,text:t});
     }
-    console.log("[RuahVerse] ✅ 암송 구절 로드 완료:", res.length+"개");
-  }catch(ex){
-    console.error("[RuahVerse] parseGviz 오류:", ex);
-  }
+    console.log("[RuahVerse] ✅ 로드 완료:", res.length+"개");
+  }catch(ex){console.error("[RuahVerse] parseGviz 오류:", ex);}
   return res;
+}
+
+/* ── 절별 분리: " 숫자 " 패턴으로 split, ref에서 시작 절번호 추출 ── */
+function parseVerseLines(text, ref){
+  var startNum=null, m=ref.match(/:([0-9]+)/);
+  if(m) startNum=parseInt(m[1]);
+  var parts=text.split(/\s+([0-9]{1,3})\s+/);
+  var lines=[];
+  lines.push({num:startNum, text:parts[0].trim()});
+  for(var i=1;i<parts.length-1;i+=2){
+    lines.push({num:parseInt(parts[i]), text:parts[i+1].trim()});
+  }
+  return lines;
+}
+
+/* ── 절별 HTML 생성 (읽기 전용) ── */
+function renderVerseHTML(text, ref){
+  var lines=parseVerseLines(text,ref);
+  if(lines.length<=1){
+    return '<div class="verse">'+text+'</div>';
+  }
+  var html='<div class="verse-lines">';
+  for(var i=0;i<lines.length;i++){
+    html+='<div class="verse-line">'+
+          '<span class="verse-num">'+(lines[i].num||'')+'</span>'+
+          '<span class="verse-body">'+lines[i].text+'</span>'+
+          '</div>';
+  }
+  return html+'</div>';
 }
 
 /* ── 초기화 ── */
@@ -181,12 +205,11 @@ async function init(){
   try{
     var r=await fetch(GVIZ_URL);
     if(!r.ok) throw new Error("HTTP "+r.status);
-    var raw=await r.text();
-    verses=parseGviz(raw);
-    if(!verses.length) throw new Error("empty result");
+    verses=parseGviz(await r.text());
+    if(!verses.length) throw new Error("empty");
     document.getElementById("errBox").style.display="none";
   }catch(ex){
-    console.warn("[RuahVerse] 시트 연결 실패:", ex.message);
+    console.warn("[RuahVerse] 시트 실패:", ex.message);
     verses=DEMO;
     var eb=document.getElementById("errBox");
     eb.style.display="block";
@@ -262,10 +285,10 @@ function render(){
     }
     app.innerHTML=
       '<div class="ref">'+verse.ref+'</div>'+
-      '<div class="verse">'+buildBlanksHTML()+'</div>'+
+      buildBlanksHTML()+
       '<div class="hint-panel" id="hintPanel">'+chips+'</div>';
   }else{
-    app.innerHTML='<div class="ref">'+verse.ref+'</div><div class="verse">'+verse.text+'</div>';
+    app.innerHTML='<div class="ref">'+verse.ref+'</div>'+renderVerseHTML(verse.text,verse.ref);
   }
 
   document.getElementById("fb").textContent="";
@@ -292,10 +315,31 @@ function buildBlanks(ratio){
   blanks.sort(function(a,b){return a-b;});
 }
 
-/* ── 빈칸 HTML 생성 ── */
+/* ── 빈칸 HTML 생성 (절별 줄바꿈 포함) ── */
 function buildBlanksHTML(){
-  var words=verse.text.split(" "),html="";
-  for(var i=0;i<words.length;i++){
+  var words=verse.text.split(" ");
+  var lines=parseVerseLines(verse.text, verse.ref);
+  if(lines.length<=1){
+    return '<div class="verse">'+buildWordsHTML(words,0,words.length)+'</div>';
+  }
+  var html='<div class="verse-lines">';
+  var cursor=0;
+  for(var li=0;li<lines.length;li++){
+    var lineWords=lines[li].text.split(" ");
+    var start=cursor, end=cursor+lineWords.length;
+    html+='<div class="verse-line">'+
+          '<span class="verse-num">'+(lines[li].num||'')+'</span>'+
+          '<span class="verse-body" style="line-height:2.4">'+buildWordsHTML(words,start,end)+'</span>'+
+          '</div>';
+    cursor=end;
+  }
+  return html+'</div>';
+}
+
+/* ── 단어 범위 HTML 생성 ── */
+function buildWordsHTML(words,start,end){
+  var html="";
+  for(var i=start;i<end;i++){
     var w=words[i];
     var sp=i<words.length-1?'<span style="display:inline-block;width:0.35em"></span>':"";
     if(blanks.indexOf(i)===-1){html+='<span>'+w+'</span>'+sp;continue;}
