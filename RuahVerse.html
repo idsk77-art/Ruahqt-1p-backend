@@ -75,11 +75,14 @@ footer{flex-shrink:0;background:var(--vanilla);border-top:1px solid var(--dune);
 .btn-play.on{background:#7a3020;}
 .btn-stop{background:transparent;border:1px solid var(--dune);border-radius:20px;padding:7px 13px;font-size:0.78rem;font-family:inherit;color:var(--text-mid);cursor:pointer;}
 select{font-family:'Noto Sans KR',sans-serif;font-size:0.74rem;border:1px solid var(--dune);border-radius:20px;padding:6px 11px;background:var(--vanilla);color:var(--text-mid);cursor:pointer;outline:none;-webkit-appearance:none;appearance:none;}
-.act-row{display:flex;gap:8px;margin-bottom:7px;}
+.act-row{display:flex;gap:8px;margin-bottom:7px;align-items:stretch;}
 .btn-main{flex:1;background:var(--umber);color:var(--vanilla);border:none;border-radius:9px;padding:12px 16px;font-size:0.88rem;font-family:'Noto Sans KR',sans-serif;font-weight:500;cursor:pointer;}
 .btn-main:active{background:var(--umber-light);}
-.btn-sec{background:transparent;border:1px solid var(--dune);border-radius:9px;padding:11px 14px;font-size:0.8rem;font-family:'Noto Sans KR',sans-serif;color:var(--text-mid);cursor:pointer;white-space:nowrap;}
-.btn-sec.on{background:var(--dune);border-color:var(--taupe);color:var(--umber);}
+.btn-sec{background:var(--vanilla);border:1px solid var(--dune);border-radius:12px;padding:10px 14px;font-size:0.72rem;font-family:'Noto Sans KR',sans-serif;color:var(--text-mid);cursor:pointer;white-space:nowrap;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:64px;box-shadow:0 1px 3px rgba(0,0,0,0.06);}
+.btn-sec .ic{font-size:1.15rem;line-height:1;}
+.btn-sec .lb{font-size:0.7rem;color:var(--text-mid);}
+.btn-sec.on{background:var(--dune);border-color:var(--taupe);}
+.btn-sec.on .lb{color:var(--umber);}
 .feedback{font-size:0.76rem;min-height:17px;color:var(--text-light);text-align:center;}
 .feedback.ok{color:var(--green);}.feedback.err{color:var(--red);}
 </style>
@@ -250,7 +253,7 @@ function render(){
       '<div class="done-q">새로운 말씀으로<br>계속 훈련하시겠습니까?</div>'+
       '<div class="done-btns">'+
       '<button class="btn-main" onclick="newVerse()">새 구절 암송 &#8594;</button>'+
-      '<button class="btn-sec" onclick="goStage(0)">이 구절 다시</button>'+
+      '<button class="btn-sec" style="flex-direction:row;gap:6px;" onclick="goStage(0)"><span class="ic">&#8635;</span><span class="lb">이 구절 다시</span></button>'+
       '</div></div>';
     return;
   }
@@ -277,8 +280,8 @@ function render(){
   document.getElementById("actRow").innerHTML=isRead
     ?'<button class="btn-main" onclick="nextStage()">읽었어요 &#8594;</button>'
     :'<button class="btn-main" onclick="check()">정답 확인</button>'+
-     '<button class="btn-sec" id="hintBtn" onclick="toggleHint()">힌트</button>'+
-     '<button class="btn-sec" onclick="reveal()">정답 보기</button>';
+     '<button class="btn-sec" id="hintBtn" onclick="toggleHint()"><span class="ic">&#128161;</span><span class="lb">힌트</span></button>'+
+     '<button class="btn-sec" onclick="reveal()"><span class="ic">&#128214;</span><span class="lb">정답 보기</span></button>';
   document.getElementById("mainEl").scrollTop=0;
 }
 
@@ -331,7 +334,7 @@ function toggleHint(){
   if(!p) return;
   hintOpen=!hintOpen;
   p.classList.toggle("show",hintOpen);
-  if(b){b.classList.toggle("on",hintOpen);b.textContent=hintOpen?"힌트 닫기":"힌트";}
+  if(b){b.classList.toggle("on",hintOpen);var lb=b.querySelector(".lb");if(lb)lb.textContent=hintOpen?"닫기":"힌트";}
 }
 function fillHint(idx,chipEl){
   if(chipEl.classList.contains("used")) return;
