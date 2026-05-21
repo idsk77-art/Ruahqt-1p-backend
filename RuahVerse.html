@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#3A302B">
 <title>RuahVerse</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,700;1,6..96,400&family=Noto+Sans+KR:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,700&family=Noto+Sans+KR:wght@300;400;500&display=swap');
 :root{
   --umber:#3A302B; --umber-light:#4e4039;
   --vanilla:#F8F4EE; --dune:#E8E1D4;
@@ -19,34 +19,32 @@ html,body{height:100%;font-family:'Noto Sans KR',sans-serif;background:var(--van
 body{display:flex;flex-direction:column;min-height:100dvh;}
 
 /* ── HEADER ── */
-header{background:var(--umber);padding:14px 20px 12px;flex-shrink:0;}
+header{background:var(--umber);padding:16px 20px 12px;flex-shrink:0;}
 .header-inner{max-width:640px;margin:0 auto;}
-.logo-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
-.logo-main{display:flex;align-items:center;gap:10px;}
-.logo-wordmark{font-family:'Bodoni Moda',serif;font-size:1.5rem;font-weight:700;line-height:1;letter-spacing:-0.01em;}
-.logo-ruah{color:var(--vanilla);} .logo-verse{color:var(--taupe);}
-.logo-divider{width:1px;height:22px;background:rgba(197,180,157,0.3);flex-shrink:0;}
-.logo-kr{display:flex;flex-direction:column;justify-content:center;gap:2px;}
-.logo-kr-name{font-size:0.7rem;color:rgba(197,180,157,0.75);font-weight:400;letter-spacing:0.06em;}
-.logo-kr-tag{font-size:0.55rem;color:rgba(197,180,157,0.4);letter-spacing:0.1em;font-weight:300;}
-.logo-slogan{margin-top:5px;font-size:0.58rem;color:rgba(197,180,157,0.38);letter-spacing:0.18em;font-weight:300;}
-.date-pill{font-size:0.68rem;color:var(--taupe);border:1px solid rgba(197,180,157,0.3);border-radius:20px;padding:4px 12px;font-weight:300;white-space:nowrap;}
+.logo-center{text-align:center;margin-bottom:12px;}
+.logo-wordmark{font-family:'Bodoni Moda',serif;font-size:1.65rem;font-weight:700;line-height:1;letter-spacing:-0.01em;display:block;margin-bottom:5px;}
+.logo-ruah{color:var(--vanilla);}.logo-verse{color:var(--taupe);}
+.logo-sub-row{font-size:0.6rem;color:rgba(197,180,157,0.5);letter-spacing:0.05em;font-weight:300;}
+.logo-sub-sep{margin:0 7px;opacity:0.35;}
 
-/* ── STAGE NAV ── */
+/* ── NAV ── */
+.nav-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;}
+.nav-status{font-size:0.62rem;color:rgba(197,180,157,0.6);font-weight:300;letter-spacing:0.03em;}
+.date-pill{font-size:0.62rem;color:var(--taupe);border:1px solid rgba(197,180,157,0.28);border-radius:20px;padding:3px 10px;font-weight:300;white-space:nowrap;}
 .stage-nav{display:flex;align-items:center;gap:8px;}
 .nav-btn{background:none;border:none;color:rgba(197,180,157,0.4);font-size:0.95rem;cursor:pointer;padding:4px 2px;line-height:1;flex-shrink:0;touch-action:manipulation;}
 .nav-btn.ghost{visibility:hidden;pointer-events:none;}
 .bars{display:flex;gap:5px;flex:1;}
 .bar{flex:1;height:2px;border-radius:1px;background:rgba(197,180,157,0.15);cursor:pointer;transition:background 0.2s;}
-.bar.done{background:rgba(197,180,157,0.5);} .bar.active{background:var(--vanilla);}
-.stage-lbl{font-size:0.6rem;color:rgba(197,180,157,0.55);letter-spacing:0.14em;margin-top:5px;font-weight:300;text-transform:uppercase;}
+.bar.done{background:rgba(197,180,157,0.5);}.bar.active{background:var(--vanilla);}
+.stage-lbl{font-size:0.6rem;color:rgba(197,180,157,0.55);letter-spacing:0.12em;margin-top:5px;font-weight:300;text-transform:uppercase;text-align:center;}
 
 /* ── MAIN ── */
-main{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:28px 20px 16px;}
+main{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:26px 20px 14px;}
 main::-webkit-scrollbar{display:none;}
 .content{max-width:600px;margin:0 auto;}
 #errBox{font-size:0.74rem;color:var(--red);background:rgba(160,64,48,0.06);border-radius:8px;padding:8px 14px;margin-bottom:14px;display:none;}
-.verse-ref{font-size:0.72rem;color:var(--taupe-mid);letter-spacing:0.1em;margin-bottom:18px;font-weight:400;}
+.verse-ref{font-size:0.72rem;color:var(--taupe-mid);letter-spacing:0.08em;margin-bottom:16px;font-weight:400;}
 .verse{font-size:clamp(1rem,2.8vw,1.1rem);line-height:2.7;color:var(--text-dark);word-break:keep-all;margin-bottom:4px;}
 .verse-lines{display:flex;flex-direction:column;gap:2px;margin-bottom:4px;}
 .verse-line{display:flex;align-items:baseline;gap:12px;padding:4px 0;}
@@ -84,28 +82,18 @@ select{font-family:'Noto Sans KR',sans-serif;font-size:0.74rem;border:1px solid 
 .btn-sec{background:transparent;border:1px solid var(--dune);border-radius:9px;padding:11px 14px;font-size:0.8rem;font-family:'Noto Sans KR',sans-serif;color:var(--text-mid);cursor:pointer;white-space:nowrap;}
 .btn-sec.on{background:var(--dune);border-color:var(--taupe);color:var(--umber);}
 .feedback{font-size:0.76rem;min-height:17px;color:var(--text-light);text-align:center;}
-.feedback.ok{color:var(--green);} .feedback.err{color:var(--red);}
+.feedback.ok{color:var(--green);}.feedback.err{color:var(--red);}
 </style>
 </head>
 <body>
 
 <header>
   <div class="header-inner">
-    <div class="logo-row">
-      <div class="logo-block">
-        <div class="logo-main">
-          <div class="logo-wordmark">
-            <span class="logo-ruah">Ruah</span><span class="logo-verse">Verse</span>
-          </div>
-          <div class="logo-divider"></div>
-          <div class="logo-kr">
-            <div class="logo-kr-name">루아버스</div>
-            <div class="logo-kr-tag">성경 암송</div>
-          </div>
-        </div>
-        <div class="logo-slogan">말씀으로 숨 쉬다</div>
-      </div>
-      <span class="date-pill" id="dateEl"></span>
+    <div class="logo-center">
+      <span class="logo-wordmark">
+        <span class="logo-ruah">Ruah</span><span class="logo-verse">Verse</span>
+      </span>
+      <div class="logo-sub-row">루아버스<span class="logo-sub-sep">|</span>성경의 숨결로 새기는 말씀</div>
     </div>
     <div id="stageNavEl"></div>
   </div>
@@ -150,8 +138,8 @@ var STAGES=[
 ];
 var DEMO=[
   {ref:"요한복음 3:16", text:"하나님이 세상을 이처럼 사랑하사 독생자를 주셨으니 이는 그를 믿는 자마다 멸망하지 않고 영생을 얻게 하려 하심이라"},
-  {ref:"빌립보서 4:13", text:"내게 능력 주시는 자 안에서 내가 모든 것을 할 수 있느니라"},
-  {ref:"시편 23:1",     text:"여호와는 나의 목자시니 내게 부족함이 없으리로다"}
+  {ref:"빌립보서 4:13",text:"내게 능력 주시는 자 안에서 내가 모든 것을 할 수 있느니라"},
+  {ref:"시편 23:1",    text:"여호와는 나의 목자시니 내게 부족함이 없으리로다"}
 ];
 var verses=[],verse=null,stage=0,blanks=[],hintOpen=false;
 var synth=window.speechSynthesis,utt=null,rCount=0,rTarget=1;
@@ -202,8 +190,6 @@ function renderVerseHTML(text,ref){
 }
 
 async function init(){
-  var d=new Date();
-  document.getElementById("dateEl").textContent=(d.getMonth()+1)+"월 "+d.getDate()+"일";
   try{
     var r=await fetch(GVIZ_URL);
     if(!r.ok) throw new Error("HTTP "+r.status);
@@ -232,18 +218,27 @@ function newVerse(){
 
 function renderNav(){
   var el=document.getElementById("stageNavEl"),isDone=stage>=STAGES.length;
+  var d=new Date();
+  var dateStr=d.getFullYear()+"년 "+(d.getMonth()+1)+"월 "+d.getDate()+"일";
+  var stageName=STAGES[Math.min(stage,STAGES.length-1)].name;
+  var shortName=stageName.split(" · ")[1]||stageName;
+  var statusStr=isDone?"✓ 암송 완료":"진행 중: "+shortName;
   var bars="";
   for(var i=0;i<STAGES.length;i++){
     var c=i<stage?" done":i===stage?" active":"";
     bars+='<div class="bar'+c+'" onclick="goStage('+i+')"></div>';
   }
   el.innerHTML=
+    '<div class="nav-top">'+
+    '<span class="nav-status">'+statusStr+'</span>'+
+    '<span class="date-pill">'+dateStr+'</span>'+
+    '</div>'+
     '<div class="stage-nav">'+
     '<button class="nav-btn'+((stage===0||isDone)?" ghost":"")+'" onclick="goStage('+(stage-1)+')">&#8249;</button>'+
     '<div class="bars">'+bars+'</div>'+
     '<button class="nav-btn'+((stage>=STAGES.length-1||isDone)?" ghost":"")+'" onclick="goStage('+(stage+1)+')">&#8250;</button>'+
     '</div>'+
-    '<div class="stage-lbl">'+(isDone?"✓ 암송 완료":STAGES[stage].name)+'</div>';
+    '<div class="stage-lbl">'+(isDone?"✓ 암송 완료":stageName)+'</div>';
 }
 
 function render(){
