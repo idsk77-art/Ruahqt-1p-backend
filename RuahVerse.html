@@ -29,15 +29,14 @@ header{background:var(--umber);padding:16px 20px 12px;flex-shrink:0;}
 
 /* ── NAV ── */
 .nav-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;}
-.nav-status{font-size:0.62rem;color:rgba(197,180,157,0.6);font-weight:300;letter-spacing:0.03em;}
+.nav-stage{font-size:0.62rem;color:rgba(197,180,157,0.65);font-weight:300;letter-spacing:0.04em;}
 .date-pill{font-size:0.62rem;color:var(--taupe);border:1px solid rgba(197,180,157,0.28);border-radius:20px;padding:3px 10px;font-weight:300;white-space:nowrap;}
-.stage-nav{display:flex;align-items:center;gap:8px;}
+.stage-nav{display:flex;align-items:center;gap:8px;margin-top:4px;}
 .nav-btn{background:none;border:none;color:rgba(197,180,157,0.4);font-size:0.95rem;cursor:pointer;padding:4px 2px;line-height:1;flex-shrink:0;touch-action:manipulation;}
 .nav-btn.ghost{visibility:hidden;pointer-events:none;}
 .bars{display:flex;gap:5px;flex:1;}
 .bar{flex:1;height:2px;border-radius:1px;background:rgba(197,180,157,0.15);cursor:pointer;transition:background 0.2s;}
 .bar.done{background:rgba(197,180,157,0.5);}.bar.active{background:var(--vanilla);}
-.stage-lbl{font-size:0.6rem;color:rgba(197,180,157,0.55);letter-spacing:0.12em;margin-top:5px;font-weight:300;text-transform:uppercase;text-align:center;}
 
 /* ── MAIN ── */
 main{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:26px 20px 14px;}
@@ -220,9 +219,7 @@ function renderNav(){
   var el=document.getElementById("stageNavEl"),isDone=stage>=STAGES.length;
   var d=new Date();
   var dateStr=d.getFullYear()+"년 "+(d.getMonth()+1)+"월 "+d.getDate()+"일";
-  var stageName=STAGES[Math.min(stage,STAGES.length-1)].name;
-  var shortName=stageName.split(" · ")[1]||stageName;
-  var statusStr=isDone?"✓ 암송 완료":"진행 중: "+shortName;
+  var stageName=isDone?"✓ 암송 완료":STAGES[stage].name;
   var bars="";
   for(var i=0;i<STAGES.length;i++){
     var c=i<stage?" done":i===stage?" active":"";
@@ -230,15 +227,14 @@ function renderNav(){
   }
   el.innerHTML=
     '<div class="nav-top">'+
-    '<span class="nav-status">'+statusStr+'</span>'+
+    '<span class="nav-stage">'+stageName+'</span>'+
     '<span class="date-pill">'+dateStr+'</span>'+
     '</div>'+
     '<div class="stage-nav">'+
     '<button class="nav-btn'+((stage===0||isDone)?" ghost":"")+'" onclick="goStage('+(stage-1)+')">&#8249;</button>'+
     '<div class="bars">'+bars+'</div>'+
     '<button class="nav-btn'+((stage>=STAGES.length-1||isDone)?" ghost":"")+'" onclick="goStage('+(stage+1)+')">&#8250;</button>'+
-    '</div>'+
-    '<div class="stage-lbl">'+(isDone?"✓ 암송 완료":stageName)+'</div>';
+    '</div>';
 }
 
 function render(){
