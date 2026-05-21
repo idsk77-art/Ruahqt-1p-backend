@@ -3,71 +3,88 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<meta name="theme-color" content="#443A35">
+<meta name="theme-color" content="#3A302B">
 <title>RuahVerse</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,800&family=Noto+Sans+KR:wght@300;400;500&display=swap');
-:root{--umber:#443A35;--vanilla:#F8F4EE;--dune:#E4DDCC;--taupe:#C5B49D;--taupe-mid:#a89880;--text-dark:#1e1610;--text-mid:#5c4e42;--text-light:#9e8e7e;}
+@import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,700;1,6..96,400&family=Noto+Sans+KR:wght@300;400;500&display=swap');
+:root{
+  --umber:#3A302B; --umber-light:#4e4039;
+  --vanilla:#F8F4EE; --dune:#E8E1D4;
+  --taupe:#C5B49D; --taupe-mid:#a89880;
+  --text-dark:#1e1610; --text-mid:#5c4e42; --text-light:#9e8e7e;
+  --green:#5a7a48; --red:#a04030;
+}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;font-family:'Noto Sans KR',sans-serif;background:var(--vanilla);color:var(--text-dark);-webkit-font-smoothing:antialiased;}
 body{display:flex;flex-direction:column;min-height:100dvh;}
-header{background:var(--umber);padding:16px 20px 14px;flex-shrink:0;}
-.header-inner{max-width:640px;margin:0 auto;width:100%;}
-.logo-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
-.logo-brand{display:flex;align-items:baseline;gap:8px;}
-.logo-text{font-family:'Bodoni Moda',serif;font-size:clamp(1.2rem,3.5vw,1.45rem);font-weight:800;line-height:1;}
-.logo-ruah{color:var(--vanilla);}.logo-verse{color:var(--taupe);}
-.logo-sub{font-size:0.62rem;color:rgba(197,180,157,0.6);letter-spacing:0.1em;font-weight:300;}
-.logo-slogan{font-size:0.6rem;color:rgba(197,180,157,0.55);letter-spacing:0.08em;font-weight:300;margin-top:3px;}
-.date-pill{font-size:0.68rem;color:var(--taupe);border:1px solid rgba(197,180,157,0.35);border-radius:20px;padding:3px 12px;font-weight:300;white-space:nowrap;}
-.stage-nav{display:flex;align-items:center;gap:6px;}
-.nav-btn{background:none;border:none;color:rgba(197,180,157,0.5);font-size:1rem;cursor:pointer;padding:4px 6px;line-height:1;flex-shrink:0;border-radius:4px;touch-action:manipulation;}
+
+/* ── HEADER ── */
+header{background:var(--umber);padding:14px 20px 12px;flex-shrink:0;}
+.header-inner{max-width:640px;margin:0 auto;}
+.logo-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.logo-main{display:flex;align-items:center;gap:10px;}
+.logo-wordmark{font-family:'Bodoni Moda',serif;font-size:1.5rem;font-weight:700;line-height:1;letter-spacing:-0.01em;}
+.logo-ruah{color:var(--vanilla);} .logo-verse{color:var(--taupe);}
+.logo-divider{width:1px;height:22px;background:rgba(197,180,157,0.3);flex-shrink:0;}
+.logo-kr{display:flex;flex-direction:column;justify-content:center;gap:2px;}
+.logo-kr-name{font-size:0.7rem;color:rgba(197,180,157,0.75);font-weight:400;letter-spacing:0.06em;}
+.logo-kr-tag{font-size:0.55rem;color:rgba(197,180,157,0.4);letter-spacing:0.1em;font-weight:300;}
+.logo-slogan{margin-top:5px;font-size:0.58rem;color:rgba(197,180,157,0.38);letter-spacing:0.18em;font-weight:300;}
+.date-pill{font-size:0.68rem;color:var(--taupe);border:1px solid rgba(197,180,157,0.3);border-radius:20px;padding:4px 12px;font-weight:300;white-space:nowrap;}
+
+/* ── STAGE NAV ── */
+.stage-nav{display:flex;align-items:center;gap:8px;}
+.nav-btn{background:none;border:none;color:rgba(197,180,157,0.4);font-size:0.95rem;cursor:pointer;padding:4px 2px;line-height:1;flex-shrink:0;touch-action:manipulation;}
 .nav-btn.ghost{visibility:hidden;pointer-events:none;}
-.bars{display:flex;gap:4px;flex:1;}
-.bar{flex:1;height:2px;border-radius:1px;background:rgba(197,180,157,0.2);cursor:pointer;transition:background 0.25s;}
-.bar.done{background:var(--taupe);}.bar.active{background:var(--vanilla);}
-.stage-lbl{font-size:0.62rem;color:var(--taupe);letter-spacing:0.12em;margin-top:6px;font-weight:300;text-transform:uppercase;}
-main{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:24px 20px 16px;}
+.bars{display:flex;gap:5px;flex:1;}
+.bar{flex:1;height:2px;border-radius:1px;background:rgba(197,180,157,0.15);cursor:pointer;transition:background 0.2s;}
+.bar.done{background:rgba(197,180,157,0.5);} .bar.active{background:var(--vanilla);}
+.stage-lbl{font-size:0.6rem;color:rgba(197,180,157,0.55);letter-spacing:0.14em;margin-top:5px;font-weight:300;text-transform:uppercase;}
+
+/* ── MAIN ── */
+main{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:28px 20px 16px;}
 main::-webkit-scrollbar{display:none;}
-.content{max-width:640px;margin:0 auto;width:100%;}
-#errBox{font-size:0.74rem;color:#a05040;background:rgba(160,80,64,0.07);border-radius:8px;padding:8px 14px;margin-bottom:14px;display:none;}
-.ref{font-size:0.78rem;color:var(--taupe-mid);letter-spacing:0.06em;margin-bottom:16px;}
-.verse{font-size:clamp(1rem,2.8vw,1.12rem);line-height:2.6;color:var(--text-dark);word-break:keep-all;margin-bottom:20px;}
-.hint-panel{display:none;flex-wrap:wrap;gap:7px;background:var(--dune);border-radius:12px;padding:12px 14px;margin-bottom:18px;}
+.content{max-width:600px;margin:0 auto;}
+#errBox{font-size:0.74rem;color:var(--red);background:rgba(160,64,48,0.06);border-radius:8px;padding:8px 14px;margin-bottom:14px;display:none;}
+.verse-ref{font-size:0.72rem;color:var(--taupe-mid);letter-spacing:0.1em;margin-bottom:18px;font-weight:400;}
+.verse{font-size:clamp(1rem,2.8vw,1.1rem);line-height:2.7;color:var(--text-dark);word-break:keep-all;margin-bottom:4px;}
+.verse-lines{display:flex;flex-direction:column;gap:2px;margin-bottom:4px;}
+.verse-line{display:flex;align-items:baseline;gap:12px;padding:4px 0;}
+.verse-num{font-size:0.64rem;color:var(--taupe);font-weight:400;min-width:16px;text-align:right;flex-shrink:0;}
+.verse-body{font-size:clamp(1rem,2.8vw,1.1rem);color:var(--text-dark);word-break:keep-all;flex:1;line-height:2.4;}
+.hint-panel{display:none;flex-wrap:wrap;gap:6px;background:var(--dune);border-radius:10px;padding:11px 14px;margin-bottom:16px;}
 .hint-panel.show{display:flex;}
-.hint-chip{font-size:0.82rem;background:var(--vanilla);border:1px solid var(--taupe);border-radius:20px;padding:5px 14px;color:var(--umber);cursor:pointer;user-select:none;touch-action:manipulation;}
+.hint-chip{font-size:0.8rem;background:var(--vanilla);border:1px solid var(--taupe);border-radius:20px;padding:5px 13px;color:var(--umber);cursor:pointer;user-select:none;}
 .hint-chip.used{color:var(--taupe);border-color:var(--dune);pointer-events:none;text-decoration:line-through;}
-.blank-wrap{display:inline-block;vertical-align:middle;position:relative;margin-bottom:14px;}
-.blank-dots{display:flex;gap:4px;justify-content:center;position:absolute;bottom:-11px;left:50%;transform:translateX(-50%);pointer-events:none;}
-.blank-dot{width:5px;height:5px;border-radius:50%;background:var(--taupe);opacity:0.5;flex-shrink:0;}
-.blank-input{display:block;border:none;border-bottom:2px solid var(--taupe);background:transparent;font-size:clamp(0.95rem,2.6vw,1.05rem);font-family:'Noto Sans KR',sans-serif;color:var(--umber);text-align:center;outline:none;padding:0 4px 2px;min-width:32px;caret-color:var(--umber);touch-action:manipulation;}
-.blank-input.ok{border-color:#6a8c58;color:#4a6c3a;}.blank-input.err{border-color:#b05040;color:#b05040;}
-.done-box{text-align:center;padding:40px 20px 20px;}
-.done-icon{font-size:2.5rem;color:var(--taupe);margin-bottom:16px;}
-.done-msg{font-family:'Bodoni Moda',serif;font-size:clamp(1.3rem,4vw,1.6rem);font-weight:800;color:var(--umber);margin-bottom:6px;}
-.done-ref{font-size:0.8rem;color:var(--taupe-mid);margin-bottom:20px;font-weight:300;}
-.done-q{font-size:0.95rem;color:var(--text-mid);margin-bottom:24px;line-height:1.7;}
-.done-btns{display:flex;flex-direction:column;gap:10px;max-width:300px;margin:0 auto;}
-.done-btns .btn-main,.done-btns .btn-sm{width:100%;}
-footer{flex-shrink:0;background:var(--vanilla);border-top:1px solid var(--dune);padding:8px 20px 10px;padding-bottom:max(10px,env(safe-area-inset-bottom));}
-.footer-inner{max-width:640px;margin:0 auto;width:100%;}
-.audio-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;}
-.btn-play{background:var(--umber);color:var(--vanilla);border:none;border-radius:20px;padding:9px 20px;font-size:0.82rem;font-family:'Noto Sans KR',sans-serif;cursor:pointer;flex-shrink:0;touch-action:manipulation;}
+.blank-wrap{display:inline-block;vertical-align:middle;position:relative;margin-bottom:12px;}
+.blank-dots{display:flex;gap:3px;justify-content:center;position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);pointer-events:none;}
+.blank-dot{width:4px;height:4px;border-radius:50%;background:var(--taupe);opacity:0.45;flex-shrink:0;}
+.blank-input{display:block;border:none;border-bottom:1.5px solid var(--taupe);background:transparent;font-size:clamp(0.95rem,2.6vw,1.05rem);font-family:'Noto Sans KR',sans-serif;color:var(--umber);text-align:center;outline:none;padding:0 4px 2px;min-width:28px;caret-color:var(--umber);}
+.blank-input.ok{border-color:var(--green);color:var(--green);}
+.blank-input.err{border-color:var(--red);color:var(--red);}
+.done-box{text-align:center;padding:48px 20px 24px;}
+.done-icon{font-size:2.2rem;color:var(--taupe);margin-bottom:14px;}
+.done-msg{font-family:'Bodoni Moda',serif;font-size:1.5rem;font-weight:700;color:var(--umber);margin-bottom:6px;}
+.done-ref{font-size:0.76rem;color:var(--taupe-mid);margin-bottom:18px;font-weight:300;}
+.done-q{font-size:0.92rem;color:var(--text-mid);margin-bottom:28px;line-height:1.8;}
+.done-btns{display:flex;flex-direction:column;gap:9px;max-width:280px;margin:0 auto;}
+.done-btns .btn-main,.done-btns .btn-sec{width:100%;}
+
+/* ── FOOTER ── */
+footer{flex-shrink:0;background:var(--vanilla);border-top:1px solid var(--dune);padding:10px 20px 12px;padding-bottom:max(12px,env(safe-area-inset-bottom));}
+.footer-inner{max-width:600px;margin:0 auto;}
+.audio-row{display:flex;align-items:center;gap:7px;margin-bottom:8px;flex-wrap:wrap;}
+.btn-play{background:var(--umber);color:var(--vanilla);border:none;border-radius:20px;padding:8px 18px;font-size:0.8rem;font-family:'Noto Sans KR',sans-serif;cursor:pointer;flex-shrink:0;}
 .btn-play.on{background:#7a3020;}
-.btn-stop{background:transparent;border:1px solid var(--dune);border-radius:20px;padding:8px 14px;font-size:0.8rem;font-family:inherit;color:var(--text-mid);cursor:pointer;}
-select{font-family:'Noto Sans KR',sans-serif;font-size:0.76rem;border:1px solid var(--dune);border-radius:20px;padding:7px 12px;background:var(--vanilla);color:var(--text-mid);cursor:pointer;outline:none;-webkit-appearance:none;appearance:none;}
-.actions{display:flex;gap:8px;margin-bottom:6px;}
-.btn-main{flex:1;background:var(--umber);color:var(--vanilla);border:none;border-radius:10px;padding:11px 16px;font-size:0.9rem;font-family:'Noto Sans KR',sans-serif;font-weight:500;cursor:pointer;touch-action:manipulation;}
-.btn-main:active{background:#5a4a40;}
-.btn-sm{background:transparent;border:1px solid var(--dune);border-radius:10px;padding:10px 16px;font-size:0.82rem;font-family:'Noto Sans KR',sans-serif;color:var(--text-mid);cursor:pointer;white-space:nowrap;touch-action:manipulation;}
-.btn-sm.on{background:var(--dune);border-color:var(--taupe);color:var(--umber);}
-.feedback{font-size:0.78rem;min-height:18px;color:var(--text-light);text-align:center;}
-.feedback.ok{color:#5a8048;}.feedback.err{color:#a04030;}
-/* ── 절별 줄 표시 ── */
-.verse-lines{display:flex;flex-direction:column;gap:6px;margin-bottom:20px;}
-.verse-line{display:flex;align-items:baseline;gap:10px;line-height:1.9;}
-.verse-num{font-size:0.68rem;color:var(--taupe-mid);font-weight:400;min-width:18px;text-align:right;flex-shrink:0;letter-spacing:0.02em;padding-top:2px;}
-.verse-body{font-size:clamp(1rem,2.8vw,1.12rem);color:var(--text-dark);word-break:keep-all;flex:1;}
+.btn-stop{background:transparent;border:1px solid var(--dune);border-radius:20px;padding:7px 13px;font-size:0.78rem;font-family:inherit;color:var(--text-mid);cursor:pointer;}
+select{font-family:'Noto Sans KR',sans-serif;font-size:0.74rem;border:1px solid var(--dune);border-radius:20px;padding:6px 11px;background:var(--vanilla);color:var(--text-mid);cursor:pointer;outline:none;-webkit-appearance:none;appearance:none;}
+.act-row{display:flex;gap:8px;margin-bottom:7px;}
+.btn-main{flex:1;background:var(--umber);color:var(--vanilla);border:none;border-radius:9px;padding:12px 16px;font-size:0.88rem;font-family:'Noto Sans KR',sans-serif;font-weight:500;cursor:pointer;}
+.btn-main:active{background:var(--umber-light);}
+.btn-sec{background:transparent;border:1px solid var(--dune);border-radius:9px;padding:11px 14px;font-size:0.8rem;font-family:'Noto Sans KR',sans-serif;color:var(--text-mid);cursor:pointer;white-space:nowrap;}
+.btn-sec.on{background:var(--dune);border-color:var(--taupe);color:var(--umber);}
+.feedback{font-size:0.76rem;min-height:17px;color:var(--text-light);text-align:center;}
+.feedback.ok{color:var(--green);} .feedback.err{color:var(--red);}
 </style>
 </head>
 <body>
@@ -75,10 +92,16 @@ select{font-family:'Noto Sans KR',sans-serif;font-size:0.76rem;border:1px solid 
 <header>
   <div class="header-inner">
     <div class="logo-row">
-      <div>
-        <div class="logo-brand">
-          <div class="logo-text"><span class="logo-ruah">Ruah</span><span class="logo-verse">Verse</span></div>
-          <div class="logo-sub">루아버스</div>
+      <div class="logo-block">
+        <div class="logo-main">
+          <div class="logo-wordmark">
+            <span class="logo-ruah">Ruah</span><span class="logo-verse">Verse</span>
+          </div>
+          <div class="logo-divider"></div>
+          <div class="logo-kr">
+            <div class="logo-kr-name">루아버스</div>
+            <div class="logo-kr-tag">성경 암송</div>
+          </div>
         </div>
         <div class="logo-slogan">말씀으로 숨 쉬다</div>
       </div>
@@ -101,10 +124,8 @@ select{font-family:'Noto Sans KR',sans-serif;font-size:0.76rem;border:1px solid 
       <button class="btn-play" id="playBtn" onclick="play()">▶ 듣기</button>
       <button class="btn-stop" onclick="stop_()">■</button>
       <select id="rSel">
-        <option value="1">1회</option>
-        <option value="2">2회</option>
-        <option value="3">3회</option>
-        <option value="5">5회</option>
+        <option value="1">1회</option><option value="2">2회</option>
+        <option value="3">3회</option><option value="5">5회</option>
       </select>
       <select id="sSel">
         <option value="0.7">느리게</option>
@@ -112,97 +133,74 @@ select{font-family:'Noto Sans KR',sans-serif;font-size:0.76rem;border:1px solid 
         <option value="1.0">빠르게</option>
       </select>
     </div>
-    <div class="actions" id="actRow"></div>
+    <div class="act-row" id="actRow"></div>
     <div class="feedback" id="fb"></div>
   </div>
 </footer>
 
 <script>
-/* ================================================================
-   RuahVerse — 말씀 암송 앱
-   [gviz 실제 구조 - 디버깅 확인]
-     parsedNumHeaders = 0  → rows[0] 헤더행, 직접 건너뜀
-     col[0] = 성경구절(A열), col[1] = 말씀(B열), col[2] = 구분(C열)
-     총 168 rows = 헤더 1 + 데이터 167
-================================================================ */
-
-var SHEET_ID = "1pXcGIfEUxj2iP7TaN-TA-d4437LINxG1h0X1sfAq8bY";
-var GVIZ_URL = "https://docs.google.com/spreadsheets/d/"+SHEET_ID+"/gviz/tq?tqx=out:json&gid=0";
-
+var SHEET_ID="1pXcGIfEUxj2iP7TaN-TA-d4437LINxG1h0X1sfAq8bY";
+var GVIZ_URL="https://docs.google.com/spreadsheets/d/"+SHEET_ID+"/gviz/tq?tqx=out:json&gid=0";
 var STAGES=[
-  {name:"1단계 · 전체 읽기", blank:0.0},
-  {name:"2단계 · 빈칸 20%",  blank:0.2},
-  {name:"3단계 · 빈칸 40%",  blank:0.4},
-  {name:"4단계 · 빈칸 60%",  blank:0.6},
+  {name:"1단계 · 전체 읽기",blank:0.0},
+  {name:"2단계 · 빈칸 20%", blank:0.2},
+  {name:"3단계 · 빈칸 40%", blank:0.4},
+  {name:"4단계 · 빈칸 60%", blank:0.6},
   {name:"5단계 · 완전 암송", blank:1.0}
 ];
 var DEMO=[
-  {ref:"요한복음 3:16",  text:"하나님이 세상을 이처럼 사랑하사 독생자를 주셨으니 이는 그를 믿는 자마다 멸망하지 않고 영생을 얻게 하려 하심이라"},
+  {ref:"요한복음 3:16", text:"하나님이 세상을 이처럼 사랑하사 독생자를 주셨으니 이는 그를 믿는 자마다 멸망하지 않고 영생을 얻게 하려 하심이라"},
   {ref:"빌립보서 4:13", text:"내게 능력 주시는 자 안에서 내가 모든 것을 할 수 있느니라"},
   {ref:"시편 23:1",     text:"여호와는 나의 목자시니 내게 부족함이 없으리로다"}
 ];
-
 var verses=[],verse=null,stage=0,blanks=[],hintOpen=false;
 var synth=window.speechSynthesis,utt=null,rCount=0,rTarget=1;
 
 function rand(n){return Math.floor(Math.random()*n);}
-function storeKey(){var d=new Date();return "rv_"+d.getFullYear()+(d.getMonth()+1)+d.getDate();}
+function storeKey(){var d=new Date();return"rv_"+d.getFullYear()+(d.getMonth()+1)+d.getDate();}
 function blankSeed(){var d=new Date();return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();}
 
-/* ── gviz 파서 ── */
 function parseGviz(raw){
   var res=[];
   try{
-    var s=raw.indexOf("("), e=raw.lastIndexOf(")");
-    if(s<0||e<0) throw new Error("gviz bracket not found");
+    var s=raw.indexOf("("),e=raw.lastIndexOf(")");
+    if(s<0||e<0) throw new Error("bracket");
     var data=JSON.parse(raw.slice(s+1,e));
     var rows=data.table.rows;
-    console.log("[RuahVerse] gviz rows:", rows.length, "/ parsedNumHeaders:", data.table.parsedNumHeaders);
     for(var i=0;i<rows.length;i++){
       if(i===0) continue;
-      var row=rows[i];
-      if(!row||!row.c) continue;
+      var row=rows[i];if(!row||!row.c) continue;
       var ref=(row.c[0]&&row.c[0].v!=null)?String(row.c[0].v).trim():"";
       var t  =(row.c[1]&&row.c[1].v!=null)?String(row.c[1].v).trim():"";
       var sp=t.indexOf(" ");
       if(sp>0&&sp<=3&&!isNaN(t.slice(0,sp))) t=t.slice(sp+1);
       if(ref&&t) res.push({ref:ref,text:t});
     }
-    console.log("[RuahVerse] ✅ 로드 완료:", res.length+"개");
-  }catch(ex){console.error("[RuahVerse] parseGviz 오류:", ex);}
+    console.log("[RuahVerse] ✅",res.length+"개 로드");
+  }catch(ex){console.error("[RuahVerse]",ex);}
   return res;
 }
 
-/* ── 절별 분리 ── */
-function parseVerseLines(text, ref){
-  var startNum=null, m=ref.match(/:([0-9]+)/);
+function parseVerseLines(text,ref){
+  var startNum=null,m=ref.match(/:([0-9]+)/);
   if(m) startNum=parseInt(m[1]);
   var parts=text.split(/\s+([0-9]{1,3})\s+/);
   var lines=[];
-  lines.push({num:startNum, text:parts[0].trim()});
-  for(var i=1;i<parts.length-1;i+=2){
-    lines.push({num:parseInt(parts[i]), text:parts[i+1].trim()});
-  }
+  lines.push({num:startNum,text:parts[0].trim()});
+  for(var i=1;i<parts.length-1;i+=2)
+    lines.push({num:parseInt(parts[i]),text:parts[i+1].trim()});
   return lines;
 }
 
-/* ── 절별 읽기용 HTML ── */
-function renderVerseHTML(text, ref){
+function renderVerseHTML(text,ref){
   var lines=parseVerseLines(text,ref);
-  if(lines.length<=1){
-    return '<div class="verse">'+text+'</div>';
-  }
-  var html='<div class="verse-lines">';
-  for(var i=0;i<lines.length;i++){
-    html+='<div class="verse-line">'+
-          '<span class="verse-num">'+(lines[i].num||'')+'</span>'+
-          '<span class="verse-body">'+lines[i].text+'</span>'+
-          '</div>';
-  }
-  return html+'</div>';
+  if(lines.length<=1) return '<div class="verse">'+text+'</div>';
+  var h='<div class="verse-lines">';
+  for(var i=0;i<lines.length;i++)
+    h+='<div class="verse-line"><span class="verse-num">'+(lines[i].num||'')+'</span><span class="verse-body">'+lines[i].text+'</span></div>';
+  return h+'</div>';
 }
 
-/* ── 초기화 ── */
 async function init(){
   var d=new Date();
   document.getElementById("dateEl").textContent=(d.getMonth()+1)+"월 "+d.getDate()+"일";
@@ -213,7 +211,6 @@ async function init(){
     if(!verses.length) throw new Error("empty");
     document.getElementById("errBox").style.display="none";
   }catch(ex){
-    console.warn("[RuahVerse] 시트 실패:", ex.message);
     verses=DEMO;
     var eb=document.getElementById("errBox");
     eb.style.display="block";
@@ -227,10 +224,8 @@ function pickVerse(){
   stage=Math.min(parseInt(localStorage.getItem(storeKey())||"0"),STAGES.length);
   render();
 }
-
 function newVerse(){
-  stop_();
-  var prev=verse;
+  stop_();var prev=verse;
   do{verse=verses[rand(verses.length)];}while(verses.length>1&&verse===prev);
   stage=0;localStorage.setItem(storeKey(),0);render();
 }
@@ -254,7 +249,6 @@ function renderNav(){
 function render(){
   hintOpen=false;renderNav();
   var app=document.getElementById("app"),footer=document.getElementById("footerEl");
-
   if(stage>=STAGES.length){
     footer.style.display="none";
     app.innerHTML=
@@ -265,14 +259,12 @@ function render(){
       '<div class="done-q">새로운 말씀으로<br>계속 훈련하시겠습니까?</div>'+
       '<div class="done-btns">'+
       '<button class="btn-main" onclick="newVerse()">새 구절 암송 &#8594;</button>'+
-      '<button class="btn-sm" onclick="goStage(0)">이 구절 다시</button>'+
+      '<button class="btn-sec" onclick="goStage(0)">이 구절 다시</button>'+
       '</div></div>';
     return;
   }
-
   footer.style.display="block";
   var st=STAGES[stage],isRead=(st.blank===0);
-
   if(!isRead){
     buildBlanks(st.blank);
     var words=verse.text.split(" ");
@@ -284,19 +276,18 @@ function render(){
       chips+='<span class="hint-chip" onclick="fillHint('+idx+',this)">'+words[idx].replace(/[.,!?;:]/g,"")+'</span>';
     }
     app.innerHTML=
-      '<div class="ref">'+verse.ref+'</div>'+
+      '<div class="verse-ref">'+verse.ref+'</div>'+
       buildBlanksHTML()+
       '<div class="hint-panel" id="hintPanel">'+chips+'</div>';
   }else{
-    app.innerHTML='<div class="ref">'+verse.ref+'</div>'+renderVerseHTML(verse.text,verse.ref);
+    app.innerHTML='<div class="verse-ref">'+verse.ref+'</div>'+renderVerseHTML(verse.text,verse.ref);
   }
-
   document.getElementById("fb").textContent="";
   document.getElementById("actRow").innerHTML=isRead
     ?'<button class="btn-main" onclick="nextStage()">읽었어요 &#8594;</button>'
     :'<button class="btn-main" onclick="check()">정답 확인</button>'+
-     '<button class="btn-sm" id="hintBtn" onclick="toggleHint()">힌트</button>'+
-     '<button class="btn-sm" onclick="reveal()">정답 보기</button>';
+     '<button class="btn-sec" id="hintBtn" onclick="toggleHint()">힌트</button>'+
+     '<button class="btn-sec" onclick="reveal()">정답 보기</button>';
   document.getElementById("mainEl").scrollTop=0;
 }
 
@@ -307,8 +298,7 @@ function buildBlanks(ratio){
   for(i=0;i<words.length;i++) pool.push(i);
   blanks=[];
   while(blanks.length<n&&pool.length>0){
-    s=(s*1664525+1013904223)>>>0;
-    var p=s%pool.length;
+    s=(s*1664525+1013904223)>>>0;var p=s%pool.length;
     blanks.push(pool[p]);pool.splice(p,1);
   }
   blanks.sort(function(a,b){return a-b;});
@@ -316,15 +306,11 @@ function buildBlanks(ratio){
 
 function buildBlanksHTML(){
   var words=verse.text.split(" ");
-  var lines=parseVerseLines(verse.text, verse.ref);
-  if(lines.length<=1){
-    return '<div class="verse">'+buildWordsHTML(words,0,words.length)+'</div>';
-  }
-  var html='<div class="verse-lines">';
-  var cursor=0;
+  var lines=parseVerseLines(verse.text,verse.ref);
+  if(lines.length<=1) return '<div class="verse">'+buildWordsHTML(words,0,words.length)+'</div>';
+  var html='<div class="verse-lines">',cursor=0;
   for(var li=0;li<lines.length;li++){
-    var lineWords=lines[li].text.split(" ");
-    var start=cursor, end=cursor+lineWords.length;
+    var lw=lines[li].text.split(" "),start=cursor,end=cursor+lw.length;
     html+='<div class="verse-line">'+
           '<span class="verse-num">'+(lines[li].num||'')+'</span>'+
           '<span class="verse-body" style="line-height:2.4">'+buildWordsHTML(words,start,end)+'</span>'+
@@ -338,13 +324,13 @@ function buildWordsHTML(words,start,end){
   var html="";
   for(var i=start;i<end;i++){
     var w=words[i];
-    var sp=i<words.length-1?'<span style="display:inline-block;width:0.35em"></span>':"";
+    var sp=i<words.length-1?'<span style="display:inline-block;width:0.3em"></span>':"";
     if(blanks.indexOf(i)===-1){html+='<span>'+w+'</span>'+sp;continue;}
     var w2=w.replace(/[.,!?;:]/g,""),pt=w.slice(w2.length);
     var dc=Math.min(w2.length,10),dots="";
     for(var k=0;k<dc;k++) dots+='<span class="blank-dot"></span>';
-    var extra=w2.length>10?'<span style="font-size:0.58rem;color:var(--taupe);margin-left:2px">x'+w2.length+'</span>':"";
-    html+='<span class="blank-wrap"><input class="blank-input" id="b'+i+'" data-ans="'+w2+'" style="width:'+Math.max(32,w2.length*15+8)+'px" onkeydown="if(event.key===\'Enter\')check()"><span class="blank-dots">'+dots+extra+'</span></span>'+pt+sp;
+    var extra=w2.length>10?'<span style="font-size:0.56rem;color:var(--taupe);margin-left:2px">x'+w2.length+'</span>':"";
+    html+='<span class="blank-wrap"><input class="blank-input" id="b'+i+'" data-ans="'+w2+'" style="width:'+Math.max(28,w2.length*14+8)+'px" onkeydown="if(event.key===\'Enter\')check()"><span class="blank-dots">'+dots+extra+'</span></span>'+pt+sp;
   }
   return html;
 }
@@ -356,16 +342,13 @@ function toggleHint(){
   p.classList.toggle("show",hintOpen);
   if(b){b.classList.toggle("on",hintOpen);b.textContent=hintOpen?"힌트 닫기":"힌트";}
 }
-
 function fillHint(idx,chipEl){
   if(chipEl.classList.contains("used")) return;
   var el=document.getElementById("b"+idx);
   if(!el||el.classList.contains("ok")) return;
-  el.value=el.dataset.ans;
-  el.classList.remove("err");el.classList.add("ok");
+  el.value=el.dataset.ans;el.classList.remove("err");el.classList.add("ok");
   chipEl.classList.add("used");
 }
-
 function check(){
   var all=true,wrong=0;
   for(var i=0;i<blanks.length;i++){
@@ -386,7 +369,6 @@ function check(){
     fb.className="feedback err";fb.textContent=wrong+"개 틀렸습니다";
   }
 }
-
 function reveal(){
   for(var i=0;i<blanks.length;i++){
     var el=document.getElementById("b"+blanks[i]);
@@ -396,7 +378,6 @@ function reveal(){
   document.querySelectorAll(".hint-chip").forEach(function(c){c.classList.add("used");});
   document.getElementById("actRow").innerHTML='<button class="btn-main" onclick="nextStage()">다음 단계 &#8594;</button>';
 }
-
 function nextStage(){stage++;localStorage.setItem(storeKey(),stage);stop_();render();}
 function goStage(n){if(n<0||n>STAGES.length)return;stage=n;localStorage.setItem(storeKey(),stage);stop_();render();}
 function play(){stop_();rTarget=parseInt(document.getElementById("rSel").value);rCount=0;speak();}
