@@ -13,10 +13,12 @@ html,body{height:100%;font-family:'Noto Sans KR',sans-serif;background:var(--van
 body{display:flex;flex-direction:column;min-height:100dvh;}
 header{background:var(--umber);padding:16px 20px 14px;flex-shrink:0;}
 .header-inner{max-width:640px;margin:0 auto;width:100%;}
-.logo-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
-.logo-text{font-family:'Bodoni Moda',serif;font-size:clamp(1.3rem,4vw,1.6rem);font-weight:800;line-height:1;}
+.logo-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.logo-brand{display:flex;align-items:baseline;gap:8px;}
+.logo-text{font-family:'Bodoni Moda',serif;font-size:clamp(1.2rem,3.5vw,1.45rem);font-weight:800;line-height:1;}
 .logo-ruah{color:var(--vanilla);}.logo-verse{color:var(--taupe);}
-.logo-sub{font-size:0.58rem;color:var(--taupe);letter-spacing:0.14em;font-weight:300;margin-top:3px;}
+.logo-sub{font-size:0.62rem;color:rgba(197,180,157,0.6);letter-spacing:0.1em;font-weight:300;}
+.logo-slogan{font-size:0.6rem;color:rgba(197,180,157,0.55);letter-spacing:0.08em;font-weight:300;margin-top:3px;}
 .date-pill{font-size:0.68rem;color:var(--taupe);border:1px solid rgba(197,180,157,0.35);border-radius:20px;padding:3px 12px;font-weight:300;white-space:nowrap;}
 .stage-nav{display:flex;align-items:center;gap:6px;}
 .nav-btn{background:none;border:none;color:rgba(197,180,157,0.5);font-size:1rem;cursor:pointer;padding:4px 6px;line-height:1;flex-shrink:0;border-radius:4px;touch-action:manipulation;}
@@ -47,17 +49,17 @@ main::-webkit-scrollbar{display:none;}
 .done-q{font-size:0.95rem;color:var(--text-mid);margin-bottom:24px;line-height:1.7;}
 .done-btns{display:flex;flex-direction:column;gap:10px;max-width:300px;margin:0 auto;}
 .done-btns .btn-main,.done-btns .btn-sm{width:100%;}
-footer{flex-shrink:0;background:var(--vanilla);border-top:1px solid var(--dune);padding:12px 20px 20px;padding-bottom:max(20px,env(safe-area-inset-bottom));}
+footer{flex-shrink:0;background:var(--vanilla);border-top:1px solid var(--dune);padding:8px 20px 10px;padding-bottom:max(10px,env(safe-area-inset-bottom));}
 .footer-inner{max-width:640px;margin:0 auto;width:100%;}
-.audio-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
+.audio-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;}
 .btn-play{background:var(--umber);color:var(--vanilla);border:none;border-radius:20px;padding:9px 20px;font-size:0.82rem;font-family:'Noto Sans KR',sans-serif;cursor:pointer;flex-shrink:0;touch-action:manipulation;}
 .btn-play.on{background:#7a3020;}
 .btn-stop{background:transparent;border:1px solid var(--dune);border-radius:20px;padding:8px 14px;font-size:0.8rem;font-family:inherit;color:var(--text-mid);cursor:pointer;}
 select{font-family:'Noto Sans KR',sans-serif;font-size:0.76rem;border:1px solid var(--dune);border-radius:20px;padding:7px 12px;background:var(--vanilla);color:var(--text-mid);cursor:pointer;outline:none;-webkit-appearance:none;appearance:none;}
-.actions{display:flex;gap:8px;margin-bottom:10px;}
-.btn-main{flex:1;background:var(--umber);color:var(--vanilla);border:none;border-radius:10px;padding:14px 16px;font-size:0.9rem;font-family:'Noto Sans KR',sans-serif;font-weight:500;cursor:pointer;touch-action:manipulation;}
+.actions{display:flex;gap:8px;margin-bottom:6px;}
+.btn-main{flex:1;background:var(--umber);color:var(--vanilla);border:none;border-radius:10px;padding:11px 16px;font-size:0.9rem;font-family:'Noto Sans KR',sans-serif;font-weight:500;cursor:pointer;touch-action:manipulation;}
 .btn-main:active{background:#5a4a40;}
-.btn-sm{background:transparent;border:1px solid var(--dune);border-radius:10px;padding:12px 16px;font-size:0.82rem;font-family:'Noto Sans KR',sans-serif;color:var(--text-mid);cursor:pointer;white-space:nowrap;touch-action:manipulation;}
+.btn-sm{background:transparent;border:1px solid var(--dune);border-radius:10px;padding:10px 16px;font-size:0.82rem;font-family:'Noto Sans KR',sans-serif;color:var(--text-mid);cursor:pointer;white-space:nowrap;touch-action:manipulation;}
 .btn-sm.on{background:var(--dune);border-color:var(--taupe);color:var(--umber);}
 .feedback{font-size:0.78rem;min-height:18px;color:var(--text-light);text-align:center;}
 .feedback.ok{color:#5a8048;}.feedback.err{color:#a04030;}
@@ -74,8 +76,11 @@ select{font-family:'Noto Sans KR',sans-serif;font-size:0.76rem;border:1px solid 
   <div class="header-inner">
     <div class="logo-row">
       <div>
-        <div class="logo-text"><span class="logo-ruah">Ruah</span><span class="logo-verse">Verse</span></div>
-        <div class="logo-sub">루아버스</div>
+        <div class="logo-brand">
+          <div class="logo-text"><span class="logo-ruah">Ruah</span><span class="logo-verse">Verse</span></div>
+          <div class="logo-sub">루아버스</div>
+        </div>
+        <div class="logo-slogan">말씀으로 숨 쉬다</div>
       </div>
       <span class="date-pill" id="dateEl"></span>
     </div>
@@ -154,12 +159,11 @@ function parseGviz(raw){
     var rows=data.table.rows;
     console.log("[RuahVerse] gviz rows:", rows.length, "/ parsedNumHeaders:", data.table.parsedNumHeaders);
     for(var i=0;i<rows.length;i++){
-      if(i===0) continue;           /* rows[0] = 헤더행 건너뜀 */
+      if(i===0) continue;
       var row=rows[i];
       if(!row||!row.c) continue;
       var ref=(row.c[0]&&row.c[0].v!=null)?String(row.c[0].v).trim():"";
       var t  =(row.c[1]&&row.c[1].v!=null)?String(row.c[1].v).trim():"";
-      /* 앞 절번호 제거: "27 하나님이..." → "하나님이..." */
       var sp=t.indexOf(" ");
       if(sp>0&&sp<=3&&!isNaN(t.slice(0,sp))) t=t.slice(sp+1);
       if(ref&&t) res.push({ref:ref,text:t});
@@ -169,7 +173,7 @@ function parseGviz(raw){
   return res;
 }
 
-/* ── 절별 분리: " 숫자 " 패턴으로 split, ref에서 시작 절번호 추출 ── */
+/* ── 절별 분리 ── */
 function parseVerseLines(text, ref){
   var startNum=null, m=ref.match(/:([0-9]+)/);
   if(m) startNum=parseInt(m[1]);
@@ -182,7 +186,7 @@ function parseVerseLines(text, ref){
   return lines;
 }
 
-/* ── 절별 HTML 생성 (읽기 전용) ── */
+/* ── 절별 읽기용 HTML ── */
 function renderVerseHTML(text, ref){
   var lines=parseVerseLines(text,ref);
   if(lines.length<=1){
@@ -218,14 +222,12 @@ async function init(){
   pickVerse();
 }
 
-/* ── 구절 선택: 완전 랜덤 ── */
 function pickVerse(){
   verse=verses[rand(verses.length)];
   stage=Math.min(parseInt(localStorage.getItem(storeKey())||"0"),STAGES.length);
   render();
 }
 
-/* ── 새 구절: 이전과 다른 랜덤 ── */
 function newVerse(){
   stop_();
   var prev=verse;
@@ -233,7 +235,6 @@ function newVerse(){
   stage=0;localStorage.setItem(storeKey(),0);render();
 }
 
-/* ── 내비게이션 렌더 ── */
 function renderNav(){
   var el=document.getElementById("stageNavEl"),isDone=stage>=STAGES.length;
   var bars="";
@@ -250,7 +251,6 @@ function renderNav(){
     '<div class="stage-lbl">'+(isDone?"✓ 암송 완료":STAGES[stage].name)+'</div>';
 }
 
-/* ── 메인 렌더 ── */
 function render(){
   hintOpen=false;renderNav();
   var app=document.getElementById("app"),footer=document.getElementById("footerEl");
@@ -300,7 +300,6 @@ function render(){
   document.getElementById("mainEl").scrollTop=0;
 }
 
-/* ── 빈칸 위치 결정 ── */
 function buildBlanks(ratio){
   var words=verse.text.split(" ");
   var n=Math.max(1,Math.round(words.length*ratio));
@@ -315,7 +314,6 @@ function buildBlanks(ratio){
   blanks.sort(function(a,b){return a-b;});
 }
 
-/* ── 빈칸 HTML 생성 (절별 줄바꿈 포함) ── */
 function buildBlanksHTML(){
   var words=verse.text.split(" ");
   var lines=parseVerseLines(verse.text, verse.ref);
@@ -336,7 +334,6 @@ function buildBlanksHTML(){
   return html+'</div>';
 }
 
-/* ── 단어 범위 HTML 생성 ── */
 function buildWordsHTML(words,start,end){
   var html="";
   for(var i=start;i<end;i++){
