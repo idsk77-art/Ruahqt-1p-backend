@@ -122,50 +122,97 @@ body { display: flex; flex-direction: column; }
 
 /* ========== HOME SCREEN ========== */
 #screen-home { padding: 0; background: var(--bg); }
+
+/* ── 헤더 기본 (확장) ── */
 .home-header {
-  padding: 24px 20px 20px;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
-  transition: padding 0.3s cubic-bezier(0.4,0,0.2,1);
   overflow: hidden;
 }
-.home-header-top {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 16px;
-  transition: margin 0.3s cubic-bezier(0.4,0,0.2,1);
+
+/* 확장 영역: 브랜드 좌 + 목표 우 */
+.hdr-expanded {
+  padding: 16px 20px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  max-height: 100px;
+  opacity: 1;
+  transition: max-height 0.32s cubic-bezier(0.4,0,0.2,1),
+              opacity    0.22s cubic-bezier(0.4,0,0.2,1),
+              padding    0.32s cubic-bezier(0.4,0,0.2,1);
 }
-.home-brand { font-family: 'Noto Serif', serif; font-size: 28px; font-weight: 600; color: var(--accent); letter-spacing: -0.02em; transition: font-size 0.3s; }
-.home-brand-sub { font-size: 12px; color: var(--text3); font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; margin-top: 2px; transition: all 0.3s; overflow: hidden; max-height: 20px; opacity: 1; }
-.home-streak-badge { display: flex; align-items: center; gap: 6px; font-size: 15px; font-weight: 700; color: var(--gold); background: var(--gold-light); padding: 6px 14px; border-radius: 20px; border: 1px solid var(--gold); transition: all 0.3s; }
-.home-goal-row { display: flex; align-items: center; gap: 14px; transition: all 0.3s; }
-.goal-ring-wrap { position: relative; width: 56px; height: 56px; flex-shrink: 0; transition: width 0.3s, height 0.3s; }
+/* 목표 링 (작게) */
+.goal-ring-wrap { position: relative; width: 36px; height: 36px; flex-shrink: 0; }
 .goal-ring-wrap svg { position: absolute; inset: 0; transform: rotate(-90deg); }
-.goal-ring-bg { fill: none; stroke: var(--border); stroke-width: 5; }
-.goal-ring-fill { fill: none; stroke: var(--correct); stroke-width: 5; stroke-linecap: round; transition: stroke-dashoffset 0.6s cubic-bezier(0.4,0,0.2,1); }
+.goal-ring-bg   { fill: none; stroke: var(--border); stroke-width: 4; }
+.goal-ring-fill { fill: none; stroke: var(--correct); stroke-width: 4; stroke-linecap: round;
+                  transition: stroke-dashoffset 0.6s cubic-bezier(0.4,0,0.2,1); }
 .goal-ring-fill.done { stroke: var(--gold); }
-.goal-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-.goal-center-num { font-size: 13px; font-weight: 700; color: var(--text); line-height: 1; transition: font-size 0.3s; }
-.goal-center-sub { font-size: 9px; color: var(--text3); font-weight: 500; margin-top: 1px; transition: all 0.3s; }
-.goal-text { flex: 1; transition: all 0.3s; overflow: hidden; }
-.goal-text-main { font-size: 15px; font-weight: 600; color: var(--text); line-height: 1.3; transition: font-size 0.3s; }
-.goal-text-sub { font-size: 12px; color: var(--text3); margin-top: 3px; transition: all 0.3s; max-height: 20px; opacity: 1; overflow: hidden; }
+.goal-center { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+.goal-center-num { font-size: 11px; font-weight: 700; color: var(--text); line-height: 1; }
+/* 브랜드 좌측 */
+.hdr-brand-block { flex: 1; min-width: 0; }
+.home-brand { font-family: 'Noto Serif', serif; font-size: 22px; font-weight: 600; color: var(--accent); letter-spacing: -0.02em; }
+.goal-text-sub  { font-size: 11px; color: var(--text3); margin-top: 2px; }
+/* 우측: 스트릭 + 목표 pill */
+.hdr-right-block { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
+.home-streak-badge { display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700;
+  color: var(--gold); background: var(--gold-light); padding: 3px 9px;
+  border-radius: 20px; border: 1px solid var(--gold); }
+.hdr-goal-pill { display: flex; align-items: center; gap: 8px; background: var(--surface2);
+  border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px 5px 6px; }
+.hdr-goal-pill-text { display: flex; flex-direction: column; align-items: flex-start; }
+.goal-text-main { font-size: 12px; font-weight: 600; color: var(--text); line-height: 1.2; }
+.goal-pill-sub  { font-size: 10px; color: var(--text3); margin-top: 1px; }
 
-/* ── compact (스크롤 시) ── */
-.home-header.compact { padding: 10px 20px; }
-.home-header.compact .home-header-top { margin-bottom: 0; }
-.home-header.compact .home-brand { font-size: 18px; }
-.home-header.compact .home-brand-sub { max-height: 0; opacity: 0; margin-top: 0; }
-.home-header.compact .home-streak-badge { font-size: 12px; padding: 4px 10px; }
-.home-header.compact .home-goal-row { display: none; }
+/* ── compact 한 줄 (스크롤 시) ── */
+.hdr-compact {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  max-height: 48px;
+  opacity: 1;
+  transition: max-height 0.32s cubic-bezier(0.4,0,0.2,1),
+              opacity    0.22s cubic-bezier(0.4,0,0.2,1),
+              padding    0.32s cubic-bezier(0.4,0,0.2,1);
+  overflow: hidden;
+}
+.hdr-compact-brand { font-family: 'Noto Serif', serif; font-size: 16px; font-weight: 600; color: var(--accent); }
+/* compact 미니 진행바 */
+.hdr-mini-bar-wrap { flex: 1; display: flex; align-items: center; gap: 8px; }
+.hdr-mini-bar-bg { flex: 1; height: 5px; background: var(--border); border-radius: 99px; overflow: hidden; }
+.hdr-mini-bar-fill { height: 100%; background: var(--correct); border-radius: 99px;
+  transition: width 0.5s cubic-bezier(0.4,0,0.2,1); width: 0%; }
+.hdr-mini-bar-fill.done { background: var(--gold); }
+.hdr-mini-label { font-size: 11px; font-weight: 600; color: var(--text2); white-space: nowrap; flex-shrink: 0; }
+.hdr-compact-streak { font-size: 12px; font-weight: 700; color: var(--gold); flex-shrink: 0; }
 
-/* compact일 때 헤더 안에 인라인 미니 목표 표시 */
-.home-header-compact-goal { display: none; align-items: center; gap: 8px; }
-.home-header.compact .home-header-top .home-header-compact-goal { display: flex; }
-.compact-ring-wrap { position: relative; width: 28px; height: 28px; flex-shrink: 0; }
-.compact-ring-wrap svg { position: absolute; inset: 0; transform: rotate(-90deg); }
-.compact-goal-text { font-size: 12px; color: var(--text2); font-weight: 500; }
+/* ── 상태 전환 ── */
+/* 기본: expanded 보임, compact 숨김 */
+.home-header.scrolled .hdr-expanded {
+  max-height: 0;
+  opacity: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.home-header:not(.scrolled) .hdr-compact {
+  max-height: 0;
+  opacity: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
 .home-scroll { flex: 1; overflow-y: auto; padding: 20px; }
+
+/* 사용 안 하는 구 클래스 호환 */
+.home-header-compact-goal { display: none; }
+.home-brand-sub { display: none; }
+.home-goal-row  { display: none; }
+.home-header-top { display: none; }
 
 .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 28px; }
 .stat-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px 8px; text-align: center; box-shadow: var(--shadow); }
@@ -262,7 +309,40 @@ body { display: flex; flex-direction: column; }
 .search-input:focus { border-color: var(--accent); background: var(--surface); box-shadow: 0 0 0 3px var(--surface2); }
 .search-input::placeholder { color: var(--text3); font-weight: 400; }
 
-#screen-list .cat-scroll { padding: 16px 20px 8px; background: var(--bg); flex-shrink: 0; }
+#screen-list .cat-scroll { padding: 0 20px; background: var(--bg); flex-shrink: 0; }
+
+/* 카테고리 드롭다운 */
+.cat-dropdown-wrap { padding: 8px 20px 0; flex-shrink: 0; }
+.cat-dropdown-btn {
+  width: 100%; display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 12px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--surface);
+  font-size: 13px; font-weight: 500; color: var(--text2);
+  font-family: 'Noto Sans KR', sans-serif; cursor: pointer;
+  transition: all 0.18s;
+}
+.cat-dropdown-btn:hover { background: var(--surface2); }
+.cat-dropdown-btn .cat-dd-label { display: flex; align-items: center; gap: 6px; }
+.cat-dropdown-btn .cat-dd-label .on-cat { color: var(--accent); font-weight: 600; }
+.cat-dropdown-btn .cat-dd-arrow {
+  width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2;
+  transition: transform 0.22s cubic-bezier(0.4,0,0.2,1); flex-shrink: 0;
+}
+.cat-dropdown-btn.open .cat-dd-arrow { transform: rotate(180deg); }
+.cat-dropdown-panel {
+  overflow: hidden; max-height: 0;
+  transition: max-height 0.28s cubic-bezier(0.4,0,0.2,1);
+  background: var(--surface); border: 1px solid var(--border);
+  border-top: none; border-radius: 0 0 8px 8px; margin-top: -1px;
+}
+.cat-dropdown-panel.open { max-height: 300px; }
+.cat-dd-inner { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 12px 12px; }
+.cat-chip { padding: 5px 11px; border-radius: 6px; border: 1px solid var(--border);
+  background: var(--bg); font-size: 12px; font-weight: 500; color: var(--text2);
+  cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+.cat-chip:active { transform: scale(0.95); }
+.cat-chip.on { background: var(--accent); color: var(--bg); border-color: var(--accent); font-weight: 600; }
+
 .word-items { flex: 1; overflow-y: auto; padding: 8px 20px 24px; display: flex; flex-direction: column; gap: 10px; }
 .word-item { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px; display: flex; align-items: stretch; justify-content: space-between; gap: 12px; box-shadow: var(--shadow); transition: transform 0.2s; }
 .word-item:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
@@ -270,10 +350,8 @@ body { display: flex; flex-direction: column; }
 .wi-ko { font-size: 14px; font-weight: 500; color: var(--text2); margin-top: 4px; }
 .wi-note { font-size: 12px; color: var(--text3); margin-top: 6px; background: var(--bg); display: inline-block; padding: 2px 6px; border-radius: 4px; }
 .wi-right { display: flex; flex-direction: column; align-items: flex-end; justify-content: space-between; gap: 8px; flex-shrink: 0; }
-.wi-check { width: 22px; height: 22px; border-radius: 50%; background: var(--correct); display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(30, 142, 62, 0.2); }
+.wi-check { width: 22px; height: 22px; border-radius: 50%; background: var(--correct); display: flex; align-items: center; justify-content: center; }
 .wi-check svg { width: 12px; height: 12px; stroke: #fff; fill: none; stroke-width: 3; }
-
-/* ========== TOAST ========== */
 .toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px); background: rgba(32, 33, 36, 0.95); color: #FFF; font-size: 14px; font-weight: 500; padding: 12px 24px; border-radius: 30px; opacity: 0; pointer-events: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); white-space: nowrap; z-index: 999; box-shadow: 0 4px 12px rgba(0,0,0,0.15); backdrop-filter: blur(4px); }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 @media (prefers-color-scheme: dark) { .toast { background: rgba(232, 234, 237, 0.95); color: #000; } }
@@ -302,46 +380,48 @@ body { display: flex; flex-direction: column; }
 <!-- HOME -->
 <div id="screen-home" class="screen">
   <div class="home-header" id="home-header">
-    <div class="home-header-top">
-      <div>
+
+    <!-- 확장 상태 (기본) -->
+    <div class="hdr-expanded">
+      <div class="hdr-brand-block">
         <div class="home-brand">Κοινή</div>
-        <div class="home-brand-sub">신약 헬라어 단어 학습</div>
-      </div>
-      <div style="display:flex;align-items:center;gap:8px;">
-        <!-- compact 모드에서만 표시되는 미니 링 -->
-        <div class="home-header-compact-goal" id="compact-goal-area">
-          <div class="compact-ring-wrap">
-            <svg viewBox="0 0 28 28" width="28" height="28">
-              <circle fill="none" stroke="var(--border)" stroke-width="4" cx="14" cy="14" r="11"/>
-              <circle id="compact-ring-circle" fill="none" stroke="var(--correct)" stroke-width="4"
-                stroke-linecap="round" cx="14" cy="14" r="11"
-                stroke-dasharray="69.1" stroke-dashoffset="69.1"/>
-            </svg>
-            <div class="goal-center" id="compact-goal-num" style="font-size:9px;font-weight:700;color:var(--text);">0</div>
-          </div>
-          <span class="compact-goal-text" id="compact-goal-text">/ 10</span>
-        </div>
-        <div class="home-streak-badge" id="h-streak-badge">
-          🔥 <span id="h-streak-days">0</span>일
-        </div>
-      </div>
-    </div>
-    <div class="home-goal-row">
-      <div class="goal-ring-wrap">
-        <svg viewBox="0 0 56 56" width="56" height="56">
-          <circle class="goal-ring-bg" cx="28" cy="28" r="24"/>
-          <circle class="goal-ring-fill" id="goal-ring-circle" cx="28" cy="28" r="24" stroke-dasharray="150.8" stroke-dashoffset="150.8"/>
-        </svg>
-        <div class="goal-center">
-          <div class="goal-center-num" id="goal-done-num">0</div>
-          <div class="goal-center-sub">/ <span id="goal-target-num">10</span></div>
-        </div>
-      </div>
-      <div class="goal-text">
-        <div class="goal-text-main" id="goal-text-main">오늘의 목표: 단어 10개</div>
         <div class="goal-text-sub" id="goal-text-sub">오늘 학습을 시작해 보세요</div>
       </div>
+      <div class="hdr-right-block">
+        <div class="home-streak-badge" id="h-streak-badge" style="display:none">
+          🔥 <span id="h-streak-days">0</span>일
+        </div>
+        <div class="hdr-goal-pill" id="hdr-goal-pill">
+          <div class="goal-ring-wrap">
+            <svg viewBox="0 0 36 36" width="36" height="36">
+              <circle class="goal-ring-bg" cx="18" cy="18" r="15"/>
+              <circle class="goal-ring-fill" id="goal-ring-circle" cx="18" cy="18" r="15"
+                stroke-dasharray="94.2" stroke-dashoffset="94.2"/>
+            </svg>
+            <div class="goal-center">
+              <div class="goal-center-num" id="goal-done-num">0</div>
+            </div>
+          </div>
+          <div class="hdr-goal-pill-text">
+            <div class="goal-text-main" id="goal-text-main">목표 10개</div>
+            <div class="goal-pill-sub" id="goal-target-num">10개 남음</div>
+          </div>
+        </div>
+      </div>
     </div>
+
+    <!-- compact 상태 (스크롤 시) -->
+    <div class="hdr-compact">
+      <div class="hdr-compact-brand">Κοινή</div>
+      <div class="hdr-mini-bar-wrap">
+        <div class="hdr-mini-bar-bg">
+          <div class="hdr-mini-bar-fill" id="hdr-mini-bar-fill"></div>
+        </div>
+        <div class="hdr-mini-label" id="hdr-mini-label">0 / 10</div>
+      </div>
+      <div class="hdr-compact-streak" id="hdr-compact-streak" style="display:none">🔥 <span id="hdr-compact-streak-days">0</span>일</div>
+    </div>
+
   </div>
   <div class="home-scroll">
     <div class="stat-row">
@@ -508,7 +588,19 @@ body { display: flex; flex-direction: column; }
   <div class="search-wrap">
     <input class="search-input" placeholder="헬라어 또는 한국어로 검색..." id="search-input" oninput="renderList()" />
   </div>
-  <div class="cat-scroll" id="list-cats"></div>
+  <!-- 카테고리 드롭다운 -->
+  <div class="cat-dropdown-wrap">
+    <button class="cat-dropdown-btn" id="cat-dd-btn" onclick="toggleCatDropdown()">
+      <span class="cat-dd-label">
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3" cy="6" r="1" fill="currentColor"/><circle cx="3" cy="12" r="1" fill="currentColor"/><circle cx="3" cy="18" r="1" fill="currentColor"/></svg>
+        분류: <span class="on-cat" id="cat-dd-current">전체</span>
+      </span>
+      <svg class="cat-dd-arrow" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div class="cat-dropdown-panel" id="cat-dd-panel">
+      <div class="cat-dd-inner" id="list-cats"></div>
+    </div>
+  </div>
   <div class="word-items" id="word-items"></div>
 </div>
 
@@ -764,33 +856,55 @@ function recordStudyToday(){
 }
 
 function updateGoalRing(){
-  const done=Math.min(todayDone,DAILY_GOAL);
-  const circumference=150.8;
-  const offset=circumference*(1-done/DAILY_GOAL);
-  const ring=document.getElementById('goal-ring-circle');
-  if(ring){ring.style.strokeDashoffset=offset;ring.classList.toggle('done',todayDone>=DAILY_GOAL);}
-  const doneEl=document.getElementById('goal-done-num');if(doneEl)doneEl.textContent=todayDone;
-  const targetEl=document.getElementById('goal-target-num');if(targetEl)targetEl.textContent=DAILY_GOAL;
-  const mainEl=document.getElementById('goal-text-main');
-  const subEl=document.getElementById('goal-text-sub');
-  if(todayDone>=DAILY_GOAL){
-    if(mainEl)mainEl.textContent='🎉 오늘 목표 달성!';
-    if(subEl)subEl.textContent='오늘 학습을 완료했어요. 내일도 파이팅!';
+  const done = Math.min(todayDone, DAILY_GOAL);
+  const pct  = done / DAILY_GOAL;
+
+  // ── 확장 링 (r=15 → circumference=94.2) ──
+  const ring = document.getElementById('goal-ring-circle');
+  if(ring){
+    ring.style.strokeDashoffset = (94.2 * (1 - pct)).toFixed(2);
+    ring.classList.toggle('done', todayDone >= DAILY_GOAL);
+  }
+  const doneEl = document.getElementById('goal-done-num');
+  if(doneEl) doneEl.textContent = todayDone;
+
+  // ── 목표 pill 텍스트 ──
+  const mainEl = document.getElementById('goal-text-main');
+  const subEl  = document.getElementById('goal-pill-sub') || document.getElementById('goal-target-num');
+  if(todayDone >= DAILY_GOAL){
+    if(mainEl) mainEl.textContent = '🎉 목표 달성!';
+    if(subEl)  subEl.textContent  = '오늘 완료';
   } else {
-    if(mainEl)mainEl.textContent=`오늘의 목표: 단어 ${DAILY_GOAL}개`;
-    if(subEl)subEl.textContent=`${DAILY_GOAL-todayDone}개 더 학습하면 달성!`;
+    if(mainEl) mainEl.textContent = `목표 ${DAILY_GOAL}개`;
+    if(subEl)  subEl.textContent  = `${DAILY_GOAL - todayDone}개 남음`;
   }
-  // compact 미니 링 동기화
-  const compactRing=document.getElementById('compact-ring-circle');
-  if(compactRing){
-    const c=69.1*(1-done/DAILY_GOAL);
-    compactRing.style.strokeDashoffset=c;
-    compactRing.style.stroke=todayDone>=DAILY_GOAL?'var(--gold)':'var(--correct)';
+
+  // ── 서브텍스트 ──
+  const goalSub = document.getElementById('goal-text-sub');
+  if(goalSub){
+    goalSub.textContent = todayDone >= DAILY_GOAL
+      ? '내일도 파이팅!' : '오늘 학습을 시작해 보세요';
   }
-  const cNum=document.getElementById('compact-goal-num');if(cNum)cNum.textContent=todayDone;
-  const cText=document.getElementById('compact-goal-text');if(cText)cText.textContent=`/ ${DAILY_GOAL}`;
-  const daysEl=document.getElementById('h-streak-days');if(daysEl)daysEl.textContent=streakDays;
-  const badge=document.getElementById('h-streak-badge');if(badge)badge.style.display=streakDays>0?'flex':'none';
+
+  // ── 스트릭 뱃지 ──
+  const daysEl = document.getElementById('h-streak-days'); if(daysEl) daysEl.textContent = streakDays;
+  const badge  = document.getElementById('h-streak-badge');
+  if(badge) badge.style.display = streakDays > 0 ? 'flex' : 'none';
+
+  // ── compact 미니 진행바 ──
+  const miniFill  = document.getElementById('hdr-mini-bar-fill');
+  const miniLabel = document.getElementById('hdr-mini-label');
+  if(miniFill){
+    miniFill.style.width = (pct * 100).toFixed(1) + '%';
+    miniFill.classList.toggle('done', todayDone >= DAILY_GOAL);
+  }
+  if(miniLabel) miniLabel.textContent = `${todayDone} / ${DAILY_GOAL}`;
+
+  // ── compact 스트릭 ──
+  const cStreak     = document.getElementById('hdr-compact-streak');
+  const cStreakDays = document.getElementById('hdr-compact-streak-days');
+  if(cStreakDays) cStreakDays.textContent = streakDays;
+  if(cStreak)    cStreak.style.display   = streakDays > 0 ? 'flex' : 'none';
 }
 
 // 스피커 버튼 생성 유틸 함수 (여러 단어일 경우 버튼 여러개 렌더링)
@@ -1077,23 +1191,49 @@ function showResult(){
 }
 
 /* ===== LIST ===== */
+function toggleCatDropdown(){
+  const btn   = document.getElementById('cat-dd-btn');
+  const panel = document.getElementById('cat-dd-panel');
+  if(!btn || !panel) return;
+  const isOpen = panel.classList.contains('open');
+  btn.classList.toggle('open', !isOpen);
+  panel.classList.toggle('open', !isOpen);
+}
+
+function closeCatDropdown(){
+  document.getElementById('cat-dd-btn')?.classList.remove('open');
+  document.getElementById('cat-dd-panel')?.classList.remove('open');
+}
+
+function setListCat(c){
+  listCat = c;
+  closeCatDropdown();
+  const cur = document.getElementById('cat-dd-current');
+  if(cur) cur.textContent = c;
+  renderList();
+}
+
 function renderList(){
-  const q=document.getElementById('search-input').value.trim().toLowerCase();
-  // Cat filter bar
-  const lc=document.getElementById('list-cats');
-  lc.innerHTML=CATS.map(c=>{
-    const cnt=c==='전체'?W.length:W.filter(w=>w.c===c).length;
-    return `<div class="cat-chip${listCat===c?' on':''}" onclick="setListCat('${c}')">${c} (${cnt})</div>`;
-  }).join('');
-  let pool=listCat==='전체'?[...W]:W.filter(w=>w.c===listCat);
-  if(q)pool=pool.filter(w=>w.g.toLowerCase().includes(q)||w.k.includes(q));
-  document.getElementById('list-count').textContent=pool.length+'개';
-  const el=document.getElementById('word-items');
-  
-  el.innerHTML=pool.map((w,i)=>{
-    const m=masteryLevel(w.g); // 0~3
-    const dots=[0,1,2].map(d=>{
-      if(d<m) return `<div class="mastery-dot filled${m===3?' gold':''}"></div>`;
+  const q = document.getElementById('search-input').value.trim().toLowerCase();
+
+  // 드롭다운 칩 업데이트
+  const lc = document.getElementById('list-cats');
+  if(lc){
+    lc.innerHTML = CATS.map(c => {
+      const cnt = c==='전체' ? W.length : W.filter(w=>w.c===c).length;
+      return `<div class="cat-chip${listCat===c?' on':''}" onclick="setListCat('${c}')">${c} <span style="opacity:.6">${cnt}</span></div>`;
+    }).join('');
+  }
+
+  let pool = listCat==='전체' ? [...W] : W.filter(w=>w.c===listCat);
+  if(q) pool = pool.filter(w=>w.g.toLowerCase().includes(q)||w.k.includes(q));
+  document.getElementById('list-count').textContent = pool.length+'개';
+
+  const el = document.getElementById('word-items');
+  el.innerHTML = pool.map(w => {
+    const m = masteryLevel(w.g);
+    const dots = [0,1,2].map(d => {
+      if(d < m) return `<div class="mastery-dot filled${m===3?' gold':''}"></div>`;
       return `<div class="mastery-dot"></div>`;
     }).join('');
     return `
@@ -1101,9 +1241,9 @@ function renderList(){
       <div style="flex:1;min-width:0">
         <div class="wi-greek">${w.g}</div>
         <div class="wi-ko">${w.k}</div>
-        ${w.n?`<div class="wi-note">${w.n}</div>`:''}
-        <div style="display:flex; gap:6px; margin-top:10px; flex-wrap:wrap;">
-            ${renderSpeakButtons(w.g, true)}
+        ${w.n ? `<div class="wi-note">${w.n}</div>` : ''}
+        <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;">
+          ${renderSpeakButtons(w.g, true)}
         </div>
       </div>
       <div class="wi-right">
@@ -1114,7 +1254,7 @@ function renderList(){
   }).join('');
 }
 
-function setListCat(c){listCat=c;renderList();}
+// setListCat은 renderList 위에 정의됨
 
 /* ===== TOAST ===== */
 function toast(msg){
@@ -1169,7 +1309,7 @@ switchTab('home');
   const header   = document.getElementById('home-header');
   if(!scrollEl || !header) return;
   scrollEl.addEventListener('scroll', ()=>{
-    header.classList.toggle('compact', scrollEl.scrollTop > 30);
+    header.classList.toggle('scrolled', scrollEl.scrollTop > 10);
   }, {passive:true});
 })();
 </script>
