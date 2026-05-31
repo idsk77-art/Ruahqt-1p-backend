@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>히브리어 단어장</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=IBM+Plex+Mono:wght@400;600&family=Pretendard:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 <style>
 :root {
   /* Modern Dark Slate Theme */
@@ -598,13 +599,11 @@ const WORDS = [
   {n:39,h:"הֵן",r:"헨",m:"그녀들",t:"대명사"},
   {n:40,h:"כֹּהֵן",r:"코헨",m:"제사장",t:"명사",pl:"כֹּהֲנִים"},
   {n:41,h:"אָדָם",r:"아담",m:"사람/아담",t:"명사"},
-  {n:42,h:"הָלַךְ",r:"할라크",m:"걸었다/갔다",t:"동사"},
   {n:43,h:"אִישׁ",r:"이쉬",m:"사람/남편",t:"명사",pl:"אֲנָשִׁים"},
   {n:44,h:"לָקַח",r:"라카흐",m:"취했다/잡았다",t:"동사"},
   {n:45,h:"אִשָּׁה",r:"이샤",m:"여자/아내",t:"명사",pl:"נָשִׁים"},
   {n:46,h:"נָתַן",r:"나탄",m:"주었다/선물하였다",t:"동사"},
   {n:47,h:"שָׁמַע",r:"샤마",m:"들었다",t:"동사"},
-  {n:48,h:"דֶּרֶךְ",r:"데레크",m:"길",t:"명사"},
   {n:49,h:"לִפְנֵי",r:"리프네이",m:"~앞에",t:"전치사"},
   {n:50,h:"אֶל",r:"엘",m:"~에게",t:"전치사"},
   {n:51,h:"מִן",r:"민",m:"~으로부터",t:"전치사"},
@@ -623,7 +622,6 @@ const WORDS = [
   {n:64,h:"מָלַךְ",r:"말라크",m:"다스리다/왕노릇하다",t:"동사"},
   {n:65,h:"חָזָק",r:"하자크",m:"굳은/강한",t:"형용사"},
   {n:66,h:"שָׁכַב",r:"샤카브",m:"누웠다",t:"동사"},
-  {n:67,h:"לֶחֶם",r:"레헴",m:"빵/음식",t:"명사"},
   {n:68,h:"עַם",r:"암",m:"백성",t:"명사",pl:"עַמִּים"},
   {n:69,h:"מֶלֶךְ",r:"멜레크",m:"왕",t:"명사",pl:"מְלָכִים"},
   {n:70,h:"מַלְכָּה",r:"말카",m:"여왕",t:"명사",pl:"מְלָכוֹת"},
@@ -656,7 +654,6 @@ const WORDS = [
   {n:97,h:"נַעַר",r:"나아르",m:"소년",t:"명사",pl:"נְעָרִים"},
   {n:98,h:"שָׁפַט",r:"샤파트",m:"심판하다/재판하다",t:"동사"},
   {n:99,h:"נֶפֶשׁ",r:"네페쉬",m:"생명/영혼",t:"명사",pl:"נְפָשׁוֹת"},
-  {n:100,h:"שֵׁם",r:"솀",m:"이름/명성",t:"명사",pl:"שֵׁמוֹת"},
   {n:101,h:"דָּרַשׁ",r:"다라쉬",m:"찾다/묻다",t:"동사"},
   {n:102,h:"זָבַח",r:"자바크",m:"희생제사를 드리다",t:"동사"},
   {n:103,h:"יָדַע",r:"야다",m:"알다",t:"동사"},
@@ -665,7 +662,6 @@ const WORDS = [
   {n:106,h:"לֵב",r:"레브",m:"마음",t:"명사",pl:"לְבָבוֹת"},
   {n:107,h:"מִזְבֵּחַ",r:"미즈베아크",m:"제단",t:"명사",pl:"מִזְבְּחוֹת"},
   {n:108,h:"מִשְׁפָּט",r:"미쉬파트",m:"재판/판결",t:"명사",pl:"מִשְׁפָּטִים"},
-  {n:109,h:"עַם",r:"암",m:"백성",t:"명사"},
   {n:110,h:"עֶבֶד",r:"에베드",m:"종/노예",t:"명사",pl:"עֲבָדִים"},
   {n:111,h:"גָּאַל",r:"가알",m:"되사다/물어주다",t:"동사"},
   {n:112,h:"חָזַק",r:"카자크",m:"강하다",t:"동사"},
@@ -683,7 +679,6 @@ const WORDS = [
   {n:124,h:"קָרָא",r:"카라",m:"부르다",t:"동사"},
   {n:125,h:"בֹּקֶר",r:"보케르",m:"아침",t:"명사"},
   {n:126,h:"חֹדֶשׁ",r:"코데쉬",m:"달/월",t:"명사",pl:"חֳדָשִׁים"},
-  {n:127,h:"לַיְלָה",r:"라일라",m:"밤",t:"명사"},
   {n:128,h:"עֶרֶב",r:"에레브",m:"저녁",t:"명사",pl:"עֲרָבִים"},
   {n:129,h:"עֵת",r:"에트",m:"시간",t:"명사"},
   {n:130,h:"נָגַע",r:"나가",m:"만지다/때리다",t:"동사"},
@@ -857,7 +852,7 @@ function speakCurrent() { if(state.qPool.length) speak(WORDS[state.qPool[state.q
 function speakTyping() { if(state.tPool.length) speak(WORDS[state.tPool[state.tIdx]].h); }
 
 // 플래시카드 로직
-function startFlash() { state.fcIdx = 0; state.fcFlipped = false; renderFlash(); updateXPUI('f'); setScreen('flashScreen'); }
+function startFlash() { state.fcIdx = 0; state.fcFlipped = false; state.currentMode='f'; renderFlash(); updateXPUI('f'); setScreen('flashScreen'); }
 function renderFlash() {
   if(!WORDS.length) return;
   const w = WORDS[state.fcIdx];
@@ -1035,7 +1030,7 @@ function showResult(mode) {
   
   state.currentMode = mode; setScreen('resultScreen');
 }
-function restartCurrent() { if (state.currentMode==='q') startQuiz(); else startTyping(); }
+function restartCurrent() { if (state.currentMode==='q') startQuiz(); else if (state.currentMode==='t') startTyping(); else startFlash(); }
 
 // 단어장 리스트
 let tagFilter = '전체';
@@ -1071,6 +1066,13 @@ function renderList(list) {
       <span class="wi-tag">${w.t}</span>
     </div>
   `).join('');
+}
+
+// startMode 라우터 함수 (홈 화면 버튼용)
+function startMode(mode) {
+  if (mode === 'flash') startFlash();
+  else if (mode === 'quiz') startQuiz();
+  else if (mode === 'typing') startTyping();
 }
 
 // 초기화
