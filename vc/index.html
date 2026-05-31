@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Verse Craft 🌿 말씀카드 메이커</title>
+  <meta name="description" content="나만의 아름답고 은혜로운 성경 구절 카드를 만들어보세요." />
+
+  <!-- 폰트 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- html-to-image -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
+
+  <style>
+    /* ── 기본 리셋 ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #000; color: #d1d5db; font-family: sans-serif; }
+
+    .font-batang { font-family: 'Gowun Batang', serif; }
+    .font-quote  { font-family: 'Cinzel Decorative', cursive; }
+
+    /* 탭 활성 */
+    .tab-btn { flex: 1; padding: 8px 4px; font-size: 13px; font-weight: 600; border-radius: 6px; border: none; cursor: pointer; transition: all .2s; background: transparent; color: #6b7280; }
+    .tab-btn.active { background: #374151; color: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.5); }
+    .tab-btn:hover:not(.active) { color: #d1d5db; }
+
+    /* 공통 인풋 */
+    .inp { width: 100%; background: #111827; border: 1px solid #374151; border-radius: 8px; padding: 10px 12px; font-size: 14px; color: #fff; outline: none; transition: box-shadow .15s; }
+    .inp:focus { box-shadow: 0 0 0 2px #4b5563; }
+    .inp::placeholder { color: #6b7280; }
+
+    /* 버튼 */
+    .btn { width: 100%; padding: 12px; border-radius: 8px; border: none; font-size: 14px; font-weight: 700; cursor: pointer; transition: all .2s; }
+    .btn-primary { background: #374151; color: #fff; }
+    .btn-primary:hover:not(:disabled) { background: #4b5563; }
+    .btn-primary:disabled { background: #1f2937; color: #4b5563; cursor: not-allowed; }
+
+    /* 카드 미리보기 컨테이너 */
+    #card-wrapper { width: 100%; max-width: 360px; aspect-ratio: 9/16; position: relative; border-radius: 12px; overflow: hidden; box-shadow: 0 0 0 1px #1f2937, 0 20px 60px rgba(0,0,0,.8); flex-shrink: 0; }
+
+    /* 실제 캡처 카드 */
+    #card {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      overflow: hidden; background: #000;
+    }
+    #card-bg {
+      position: absolute; inset: -10%;
+      width: 120%; height: 120%;
+      background-size: cover; background-position: center;
+      background-image: linear-gradient(to bottom, #2d2d2d, #0a0a0a);
+      filter: blur(12px);
+      pointer-events: none;
+    }
+    #card-overlay  { position: absolute; inset: 0; background: rgba(0,0,0,.40); pointer-events: none; }
+    #card-gradient { position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,.80) 100%); pointer-events: none; }
+
+    #card-content {
+      position: relative; z-index: 10;
+      width: 100%; height: 100%;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 32px;
+      text-align: center;
+      text-shadow: 1px 1px 6px rgba(0,0,0,.8);
+      color: #fff;
+    }
+
+    #card-watermark {
+      position: absolute; bottom: 20px; left: 0; right: 0;
+      text-align: center; z-index: 10; color: #fff;
+      font-size: 9px; font-weight: 700; letter-spacing: .15em;
+      text-shadow: 1px 1px 4px rgba(0,0,0,.9);
+    }
+
+    /* 키워드 태그 */
+    .kw-tag { background: #1f2937; border: 1px solid #374151; color: #9ca3af; font-size: 11px; padding: 4px 10px; border-radius: 9999px; cursor: pointer; transition: background .15s; }
+    .kw-tag:hover { background: #374151; }
+
+    /* 저장 버튼 */
+    #save-btn { padding: 10px 24px; border-radius: 9999px; border: none; font-size: 14px; font-weight: 700; cursor: pointer; color: #fff; background: #374151; transition: all .2s; white-space: nowrap; }
+    #save-btn:hover:not(:disabled) { background: #4b5563; transform: scale(1.05); }
+    #save-btn:active:not(:disabled) { transform: scale(.97); }
+    #save-btn:disabled { background: #1f2937; color: #4b5563; cursor: not-allowed; }
+
+    /* 섹션 카드 */
+    .section { background: #111827; border: 1px solid #1f2937; border-radius: 16px; padding: 24px; }
+
+    /* 탭 래퍼 */
+    .tab-bar { display: flex; padding: 4px; background: #000; border-radius: 10px; }
+
+    /* 셀렉트 */
+    select.inp { cursor: pointer; }
+
+    /* 파일 인풋 */
+    input[type=file].inp { padding: 8px 12px; cursor: pointer; }
+
+    /* 레이블 */
+    .field-label { display: block; font-size: 11px; font-weight: 600; color: #6b7280; margin-bottom: 6px; }
+
+    /* 숫자 인풋 중앙 정렬 */
+    input[type=number].inp { text-align: center; }
+
+    /* 스크롤 */
+    ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: #000; } ::-webkit-scrollbar-thumb { background: #374151; border-radius: 3px; }
+
+    /* 패널 숨기기 */
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* 반응형 레이아웃 */
+    @media (min-width: 1024px) {
+      #layout { flex-direction: row; }
+      #left-col  { width: 50%; }
+      #right-col { width: 50%; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="min-h-screen py-8 px-4">
+<div id="layout" class="max-w-6xl mx-auto flex flex-col gap-8">
+
+  <!-- ══════════════ 왼쪽 컨트롤 ══════════════ -->
+  <div id="left-col" class="flex flex-col gap-6">
+
+    <!-- 헤더 -->
+    <div class="section">
+      <h1 class="text-2xl font-bold text-white mb-1">Verse Craft 🌿</h1>
+      <p class="text-sm" style="color:#9ca3af">나만의 아름답고 은혜로운 성경 구절 카드를 만들어보세요.</p>
+    </div>
+
+    <!-- AI 말씀 추천 -->
+    <div class="section flex flex-col gap-5">
+      <h3 class="text-base font-bold text-white">✨ AI 말씀 추천 및 생성</h3>
+
+      <!-- 탭 -->
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchTab('topic')">주제/문장</button>
+        <button class="tab-btn" onclick="switchTab('season')">기독교 절기</button>
+        <button class="tab-btn" onclick="switchTab('manual')">장절 선택</button>
+      </div>
+
+      <!-- 주제 탭 -->
+      <div id="panel-topic" class="tab-panel active flex flex-col gap-3">
+        <textarea id="topic-input" class="inp" rows="2" placeholder="예: 요즘 너무 불안하고 힘들어 / 새로운 시작"></textarea>
+        <div id="kw-tags" class="flex flex-wrap gap-2"></div>
+      </div>
+
+      <!-- 절기 탭 -->
+      <div id="panel-season" class="tab-panel">
+        <select id="season-select" class="inp">
+          <option>신년(송구영신)</option><option>사순절</option><option>고난주간</option>
+          <option selected>부활절</option><option>성령강림절</option><option>맥추감사절</option>
+          <option>추수감사절</option><option>대림절(강림절)</option><option>성탄절</option>
+        </select>
+      </div>
+
+      <!-- 장절 탭 -->
+      <div id="panel-manual" class="tab-panel flex flex-col gap-3">
+        <div class="flex gap-2">
+          <select id="testament-select" class="inp" style="width:33%" onchange="onTestamentChange()">
+            <option value="구약">구약</option>
+            <option value="신약" selected>신약</option>
+          </select>
+          <select id="book-select" class="inp" style="width:67%" onchange="onBookChange()"></select>
+        </div>
+        <div class="flex items-center gap-2">
+          <select id="chapter-select" class="inp" style="width:33%"></select>
+          <input id="start-verse" type="number" min="1" value="16" class="inp" style="width:22%" placeholder="시작" />
+          <span style="color:#6b7280;font-size:14px">~</span>
+          <input id="end-verse" type="number" min="1" value="16" class="inp" style="width:22%" placeholder="끝" />
+          <span style="color:#6b7280;font-size:14px">절</span>
+        </div>
+      </div>
+
+      <button id="search-btn" class="btn btn-primary mt-1" onclick="handleSearchVerse()">
+        맞춤 말씀 불러오기 (자동 요약)
+      </button>
+
+      <div style="padding-top:16px;border-top:1px solid #1f2937">
+        <button id="img-btn" class="btn btn-primary" onclick="handleGenerateImage()">
+          🖼️ AI 감성 배경 이미지 생성하기
+        </button>
+      </div>
+    </div>
+
+    <!-- 텍스트 직접 수정 -->
+    <div class="section flex flex-col gap-4">
+      <h3 class="text-base font-bold text-white">텍스트 직접 수정</h3>
+      <div class="flex flex-col lg:flex-row gap-4">
+        <div class="flex flex-col gap-4" style="flex:1">
+          <div>
+            <label class="field-label">한글 말씀 (개역개정)</label>
+            <textarea id="verse-ko" class="inp" rows="3" oninput="renderCard()"></textarea>
+          </div>
+          <div>
+            <label class="field-label">한글 출처</label>
+            <input id="ref-ko" type="text" class="inp" oninput="renderCard()" />
+          </div>
+        </div>
+        <div class="flex flex-col gap-4" style="flex:1">
+          <div>
+            <label class="field-label">영문 말씀 (NIV)</label>
+            <textarea id="verse-en" class="inp" rows="3" oninput="renderCard()"></textarea>
+          </div>
+          <div>
+            <label class="field-label">영문 출처</label>
+            <input id="ref-en" type="text" class="inp" oninput="renderCard()" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 배경 업로드 -->
+    <div class="section flex flex-col gap-3">
+      <label class="text-sm font-bold text-white">커스텀 배경 업로드 (선택)</label>
+      <input type="file" accept="image/*" class="inp" onchange="handleImageUpload(event)" />
+    </div>
+
+  </div><!-- /left-col -->
+
+
+  <!-- ══════════════ 오른쪽 미리보기 ══════════════ -->
+  <div id="right-col" class="flex flex-col items-center">
+
+    <div class="w-full flex justify-between items-center mb-6 px-2">
+      <h2 class="text-xl font-bold text-white">미리보기</h2>
+      <button id="save-btn" onclick="handleDownload()">이미지 저장 💾</button>
+    </div>
+
+    <div id="card-wrapper">
+      <div id="card">
+        <div id="card-bg"></div>
+        <div id="card-overlay"></div>
+        <div id="card-gradient"></div>
+        <div id="card-content">
+          <div class="font-quote" style="font-size:44px;line-height:1;margin-bottom:8px;opacity:.6">"</div>
+          <div id="display-verse-ko" class="font-batang" style="font-size:16px;font-weight:700;line-height:1.7;margin-bottom:20px;white-space:nowrap"></div>
+          <div id="display-ref-ko" class="font-batang" style="font-size:10px;font-weight:500;letter-spacing:.05em;margin-bottom:28px;white-space:nowrap"></div>
+          <div id="display-verse-en" style="font-family:Georgia,serif;font-size:10px;line-height:1.7;margin-bottom:12px;opacity:.85;color:#d1d5db;white-space:nowrap"></div>
+          <div id="display-ref-en" style="font-family:Georgia,serif;font-size:8px;opacity:.85;color:#d1d5db;white-space:nowrap"></div>
+        </div>
+        <div id="card-watermark">VerseCraft</div>
+      </div>
+    </div>
+
+  </div><!-- /right-col -->
+
+</div><!-- /layout -->
+</div><!-- /min-h-screen -->
+
+
+<script>
+// ══════════════════════════════════════════════════════
+//  ⚙️  여기에 API 서버 주소를 입력하세요
+//      Render 백엔드 배포 후 실제 URL로 교체
+// ══════════════════════════════════════════════════════
+const API_BASE = 'https://ruahqt.onrender.com'; // ← 배포 후 수정
+
+// ─── 성경 데이터 ─────────────────────────────────────────────────
+const BIBLE_BOOKS = {
+  '구약': [
+    {n:'창세기',c:50},{n:'출애굽기',c:40},{n:'레위기',c:27},{n:'민수기',c:36},{n:'신명기',c:34},
+    {n:'여호수아',c:24},{n:'사사기',c:21},{n:'룻기',c:4},{n:'사무엘상',c:31},{n:'사무엘하',c:24},
+    {n:'열왕기상',c:22},{n:'열왕기하',c:25},{n:'역대상',c:29},{n:'역대하',c:36},{n:'에스라',c:10},
+    {n:'느헤미야',c:13},{n:'에스더',c:10},{n:'욥기',c:42},{n:'시편',c:150},{n:'잠언',c:31},
+    {n:'전도서',c:12},{n:'아가',c:8},{n:'이사야',c:66},{n:'예레미야',c:52},{n:'예레미야애가',c:5},
+    {n:'에스겔',c:48},{n:'다니엘',c:12},{n:'호세아',c:14},{n:'요엘',c:3},{n:'아모스',c:9},
+    {n:'오바댜',c:1},{n:'요나',c:4},{n:'미가',c:7},{n:'나훔',c:3},{n:'하박국',c:3},
+    {n:'스바냐',c:3},{n:'학개',c:2},{n:'스가랴',c:14},{n:'말라기',c:4}
+  ],
+  '신약': [
+    {n:'마태복음',c:28},{n:'마가복음',c:16},{n:'누가복음',c:24},{n:'요한복음',c:21},{n:'사도행전',c:28},
+    {n:'로마서',c:16},{n:'고린도전서',c:16},{n:'고린도후서',c:13},{n:'갈라디아서',c:6},{n:'에베소서',c:6},
+    {n:'빌립보서',c:4},{n:'골로새서',c:4},{n:'데살로니가전서',c:5},{n:'데살로니가후서',c:3},{n:'디모데전서',c:6},
+    {n:'디모데후서',c:4},{n:'디도서',c:3},{n:'빌레몬서',c:1},{n:'히브리서',c:13},{n:'야고보서',c:5},
+    {n:'베드로전서',c:5},{n:'베드로후서',c:3},{n:'요한1서',c:5},{n:'요한2서',c:1},{n:'요한3서',c:1},
+    {n:'유다서',c:1},{n:'요한계시록',c:22}
+  ]
+};
+const KEYWORDS = ['사랑','소망','믿음','평안','위로','인내','감사','용서','기쁨','축복','구원','은혜','동행','지혜','능력','회복','기도','응답','빛','생명'];
+
+// ─── 초기값 ──────────────────────────────────────────────────────
+const defaults = {
+  ko: '위의 것을 생각하고\n땅의 것을 생각하지 말라',
+  refKo: '골로새서 3장 2절',
+  en: 'Set your minds on things above,\nnot on earthly things.',
+  refEn: 'Colossians 3:2'
+};
+
+// ─── 페이지 로드 ─────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  // 기본값 채우기
+  document.getElementById('verse-ko').value = defaults.ko;
+  document.getElementById('ref-ko').value   = defaults.refKo;
+  document.getElementById('verse-en').value = defaults.en;
+  document.getElementById('ref-en').value   = defaults.refEn;
+
+  // 키워드 태그
+  const shuffled = [...KEYWORDS].sort(() => .5 - Math.random()).slice(0, 10);
+  const container = document.getElementById('kw-tags');
+  shuffled.forEach(kw => {
+    const btn = document.createElement('button');
+    btn.className = 'kw-tag';
+    btn.textContent = '#' + kw;
+    btn.onclick = () => {
+      const ta = document.getElementById('topic-input');
+      ta.value = ta.value ? ta.value + ' ' + kw : kw;
+    };
+    container.appendChild(btn);
+  });
+
+  // 성경 셀렉트 초기화
+  populateBooks('신약');
+  populateChapters('요한복음');
+
+  renderCard();
+});
+
+// ─── 탭 전환 ─────────────────────────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.tab-btn').forEach((b, i) => {
+    b.classList.toggle('active', ['topic','season','manual'][i] === name);
+  });
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+}
+
+// ─── 성경 셀렉트 헬퍼 ────────────────────────────────────────────
+function populateBooks(testament) {
+  const sel = document.getElementById('book-select');
+  sel.innerHTML = '';
+  BIBLE_BOOKS[testament].forEach(b => {
+    const opt = document.createElement('option');
+    opt.value = b.n; opt.textContent = b.n;
+    if (b.n === '요한복음') opt.selected = true;
+    sel.appendChild(opt);
+  });
+  populateChapters(sel.value);
+}
+function populateChapters(bookName) {
+  const testament = document.getElementById('testament-select').value;
+  const book = BIBLE_BOOKS[testament].find(b => b.n === bookName);
+  const sel = document.getElementById('chapter-select');
+  sel.innerHTML = '';
+  for (let i = 1; i <= (book?.c || 1); i++) {
+    const opt = document.createElement('option');
+    opt.value = i; opt.textContent = i + '장';
+    if (i === 3) opt.selected = true;
+    sel.appendChild(opt);
+  }
+}
+function onTestamentChange() {
+  populateBooks(document.getElementById('testament-select').value);
+}
+function onBookChange() {
+  populateChapters(document.getElementById('book-select').value);
+}
+
+// ─── 카드 렌더 ──────────────────────────────────────────────────
+function renderCard() {
+  const ko    = document.getElementById('verse-ko').value;
+  const refKo = document.getElementById('ref-ko').value;
+  const en    = document.getElementById('verse-en').value;
+  const refEn = document.getElementById('ref-en').value;
+
+  function toHtml(text) {
+    return text.split('\n').map(l => escHtml(l)).join('<br>');
+  }
+  function escHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  document.getElementById('display-verse-ko').innerHTML = toHtml(ko);
+  document.getElementById('display-ref-ko').textContent  = refKo;
+  document.getElementById('display-verse-en').innerHTML = toHtml(en);
+  document.getElementById('display-ref-en').textContent  = refEn;
+}
+
+// ─── 공통 API 요청 ───────────────────────────────────────────────
+async function callAPI(endpoint, body) {
+  const res = await fetch(API_BASE + endpoint, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || 'HTTP ' + res.status);
+  }
+  return res.json();
+}
+
+// ─── 말씀 검색 ──────────────────────────────────────────────────
+async function handleSearchVerse() {
+  const btn = document.getElementById('search-btn');
+  btn.disabled = true;
+  btn.textContent = '구절 찾는 중...';
+
+  const req = `
+요구사항:
+1. 추천한 구절의 핵심 문장만 AI가 의미를 살려 요약/발췌하여 모바일 세로 화면(9:16 비율) 이미지 위에 아름답게 배치되도록 해주세요. (약 50자 이내 권장)
+2. 한글 말씀은 개역개정판(KRV)을 기준으로 하고, 문맥과 의미를 파악하여 가장 자연스럽고 어색하지 않은 위치에서 줄바꿈(\\n)을 넣어주세요.
+3. 영문 말씀은 NIV 버전을 기준으로 하고, 한글과 동일한 의미 단위로 자연스럽게 줄바꿈(\\n)을 넣어주세요.
+4. 레퍼런스는 정확한 성경 장절(예: 시편 23편 1-2절, Psalm 23:1-2)로 표기해주세요. 발췌라는 단어는 쓰지 마세요.
+
+반드시 아래 JSON 형식으로만 응답해주세요.
+{"koreanVerse":"한글 성경 구절 내용 (줄바꿈 \\n 포함)","koreanReference":"한글 구절 정보","englishVerse":"영문 성경 구절 내용 (줄바꿈 \\n 포함)","englishReference":"영문 구절 정보"}`;
+
+  // 현재 탭에서 프롬프트 결정
+  const activePanel = document.querySelector('.tab-panel.active').id;
+  let prompt = '';
+
+  if (activePanel === 'panel-topic') {
+    const topic = document.getElementById('topic-input').value.trim();
+    if (!topic) { alert('주제어나 문장을 입력해주세요.'); btn.disabled = false; btn.textContent = '맞춤 말씀 불러오기 (자동 요약)'; return; }
+    prompt = `다음 주제나 상황에 가장 잘 어울리고 위로가 되는 성경 구절 하나를 추천해주세요: "${topic}"\n${req}`;
+  } else if (activePanel === 'panel-season') {
+    const season = document.getElementById('season-select').value;
+    prompt = `다음 기독교 절기에 가장 잘 어울리고 은혜로운 성경 구절 하나를 추천해주세요: "${season}"\n${req}`;
+  } else {
+    const book    = document.getElementById('book-select').value;
+    const chapter = document.getElementById('chapter-select').value;
+    const sv      = document.getElementById('start-verse').value;
+    const ev      = document.getElementById('end-verse').value;
+    const range   = sv === ev ? `${sv}절` : `${sv}절부터 ${ev}절`;
+    const refStr  = sv === ev ? `${book} ${chapter}:${sv}` : `${book} ${chapter}:${sv}-${ev}`;
+    prompt = `"${book} ${chapter}장 ${range}"의 성경 구절을 찾아주세요.\n${req}\n(참고: 사용자가 요청한 범위("${refStr}")로 표기)`;
+  }
+
+  try {
+    const result = await callAPI('/api/verse', { prompt });
+    const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (text) {
+      const data = JSON.parse(text);
+      document.getElementById('verse-ko').value = data.koreanVerse;
+      document.getElementById('ref-ko').value   = data.koreanReference;
+      document.getElementById('verse-en').value = data.englishVerse;
+      document.getElementById('ref-en').value   = data.englishReference;
+      renderCard();
+    }
+  } catch (e) {
+    alert('구절을 검색하는 중 오류가 발생했습니다.\n(' + e.message + ')');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '맞춤 말씀 불러오기 (자동 요약)';
+  }
+}
+
+// ─── 배경 이미지 생성 ────────────────────────────────────────────
+async function handleGenerateImage() {
+  const btn = document.getElementById('img-btn');
+  btn.disabled = true;
+  btn.textContent = '이미지 생성 중 (약 10초)...';
+  try {
+    const prompt = 'A beautiful, serene, aesthetic, and peaceful nature background. Vertical 9:16 aspect ratio composition, soft natural lighting, beautiful sky, clouds, or landscape. Minimalist with empty space. CRITICAL INSTRUCTION: Absolutely NO TEXT, NO WORDS, NO LETTERS, NO TYPOGRAPHY, NO WATERMARKS in the image. Pure visual background only.';
+    const result = await callAPI('/api/image', { prompt });
+    if (result.predictions?.[0]) {
+      const url = 'data:image/png;base64,' + result.predictions[0].bytesBase64Encoded;
+      document.getElementById('card-bg').style.backgroundImage = `url(${url})`;
+      document.getElementById('card-bg').style.filter = 'blur(12px)';
+    } else {
+      throw new Error(result.error?.message || '이미지 데이터를 받지 못했습니다.');
+    }
+  } catch (e) {
+    alert('이미지를 생성하는 중 오류가 발생했습니다.\n(' + e.message + ')');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🖼️ AI 감성 배경 이미지 생성하기';
+  }
+}
+
+// ─── 커스텀 배경 업로드 ──────────────────────────────────────────
+function handleImageUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    document.getElementById('card-bg').style.backgroundImage = `url(${ev.target.result})`;
+  };
+  reader.readAsDataURL(file);
+}
+
+// ─── 카드 저장 ──────────────────────────────────────────────────
+async function handleDownload() {
+  if (!window.htmlToImage) { alert('이미지 변환 라이브러리를 불러오는 중입니다. 잠시 후 다시 시도해주세요.'); return; }
+  const btn = document.getElementById('save-btn');
+  btn.disabled = true;
+  btn.textContent = '저장 중...';
+  try {
+    await document.fonts.ready;
+    const node = document.getElementById('card');
+    await new Promise(r => setTimeout(r, 120));
+    const dataUrl = await window.htmlToImage.toJpeg(node, {
+      pixelRatio: 2, quality: 1.0, cacheBust: true,
+      style: { transform: 'none' }
+    });
+    const d = new Date();
+    const name = `VerseCraft${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}${Math.random().toString(36).slice(2,6)}.jpg`;
+    const a = document.createElement('a');
+    a.href = dataUrl; a.download = name; a.click();
+  } catch (e) {
+    alert('이미지를 저장하는 중 문제가 발생했습니다.');
+    console.error(e);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '이미지 저장 💾';
+  }
+}
+</script>
+</body>
+</html>
