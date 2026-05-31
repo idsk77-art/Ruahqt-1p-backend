@@ -68,34 +68,50 @@ body{background:#050505;display:flex;align-items:center;justify-content:center;m
 .streak-num{font-size:12px;font-weight:700;color:var(--accent);font-family:'IBM Plex Mono',monospace;margin-left:auto;}
 #homeScreen{overflow-y:auto;background:transparent;padding-bottom:12px !important;}
 .home-hero{padding:48px 24px 28px;display:flex;flex-direction:column;align-items:center;gap:6px;position:relative;}
-.home-header{display:flex;align-items:center;justify-content:space-between;padding:18px 22px 0;flex-shrink:0;}
-.home-appname{font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--text-3);text-transform:uppercase;}
-.home-xp-pill{background:var(--accent-soft);border:1px solid var(--accent-border);border-radius:var(--r-full);padding:4px 12px;font-size:12px;font-weight:700;color:var(--accent);font-family:'IBM Plex Mono',monospace;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);}
-.home-hero{padding:28px 24px 20px;display:flex;flex-direction:column;align-items:center;gap:4px;position:relative;}
-.home-hero::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:260px;height:200px;background:radial-gradient(circle,rgba(228,201,126,.07) 0%,transparent 70%);pointer-events:none;}
-.hero-glyph{font-size:56px;line-height:1;font-family:'IBM Plex Mono',monospace;color:var(--accent);margin-bottom:2px;text-shadow:0 0 28px rgba(228,201,126,.28);}
-.hero-title{font-family:'Noto Serif KR',serif;font-size:20px;font-weight:700;letter-spacing:-.02em;color:var(--text);}
-.hero-sub{font-size:10px;color:var(--text-3);letter-spacing:.12em;font-weight:600;margin-top:2px;}
-.stat-row{display:flex;align-items:center;margin:0 20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:14px 0;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);}
-.stat-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;}
-.sv{font-size:18px;font-weight:700;color:var(--accent);font-family:'IBM Plex Mono',monospace;line-height:1;}
-.sk{font-size:9px;color:var(--text-3);font-weight:600;letter-spacing:.05em;}
-.stat-div{width:1px;height:28px;background:var(--border);}
-.word-count-row{display:flex;justify-content:center;padding:14px 20px 4px;}
-.word-count-badge{background:rgba(167,139,250,.07);border:1px solid rgba(167,139,250,.16);border-radius:var(--r-full);padding:5px 16px;font-size:12px;font-weight:600;color:var(--violet);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);}
-.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 20px 20px;}
-.mode-tile{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:18px 16px;cursor:pointer;display:flex;flex-direction:column;align-items:flex-start;gap:8px;transition:border-color .2s,background .2s;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);position:relative;overflow:hidden;}
-.mode-tile::after{content:'';position:absolute;inset:0;opacity:0;background:linear-gradient(135deg,rgba(255,255,255,.04),transparent);transition:opacity .2s;}
-.mode-tile:hover{border-color:var(--border2);background:var(--surface2);}
-.mode-tile:hover::after{opacity:1;}
-.mode-tile:active{transform:scale(.97);}
-.tile-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;}
-.tile-icon.gold{background:var(--accent-soft);color:var(--accent);}
-.tile-icon.blue{background:var(--blue-soft);color:var(--blue);}
-.tile-icon.violet{background:var(--violet-soft);color:var(--violet);}
-.tile-icon.green{background:var(--green-soft);color:var(--green);}
-.tile-label{font-size:15px;font-weight:700;letter-spacing:-.01em;}
-.tile-sub{font-size:11px;color:var(--text-2);}
+.home-header{display:flex;align-items:center;justify-content:space-between;padding:20px 22px 0;flex-shrink:0;}
+.home-appname{font-size:10px;font-weight:700;letter-spacing:.14em;color:var(--text-3);text-transform:uppercase;}
+.home-xp-pill{background:var(--accent-soft);border:1px solid var(--accent-border);border-radius:var(--r-full);padding:4px 12px;font-size:11px;font-weight:700;color:var(--accent);font-family:'IBM Plex Mono',monospace;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);}
+/* ── hero ── */
+.home-hero{padding:22px 24px 0;display:flex;flex-direction:column;align-items:flex-start;gap:2px;position:relative;}
+.home-hero::before{content:'';position:absolute;top:-20px;right:-30px;width:220px;height:220px;background:radial-gradient(circle,rgba(228,201,126,.06) 0%,transparent 68%);pointer-events:none;}
+.hero-glyph{font-size:48px;line-height:1;font-family:'IBM Plex Mono',monospace;color:var(--accent);text-shadow:0 0 24px rgba(228,201,126,.22);}
+.hero-title{font-family:'Noto Serif KR',serif;font-size:26px;font-weight:700;letter-spacing:-.03em;color:var(--text);line-height:1.1;margin-top:6px;}
+.hero-sub{font-size:10px;color:rgba(255,255,255,.28);letter-spacing:.16em;font-weight:600;margin-top:4px;text-transform:uppercase;}
+/* ── bento grid ── */
+.bento-grid{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto auto;gap:10px;padding:18px 20px 0;}
+/* 큰 카드 (암기) - 2열 차지 */
+.btile{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);cursor:pointer;transition:border-color .18s,background .18s,transform .15s;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);position:relative;overflow:hidden;}
+.btile:active{transform:scale(.97);}
+.btile::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.025),transparent);opacity:0;transition:opacity .2s;}
+.btile:hover{border-color:var(--border2);}
+.btile:hover::before{opacity:1;}
+.btile-wide{grid-column:1/3;display:flex;align-items:center;gap:18px;padding:20px 22px;}
+.btile-sq{display:flex;flex-direction:column;justify-content:space-between;padding:16px;}
+.btile-wide-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.btile-wide-text{}
+.btile-wide-label{font-size:18px;font-weight:700;letter-spacing:-.02em;color:var(--text);}
+.btile-wide-sub{font-size:12px;color:var(--text-2);margin-top:3px;}
+.btile-wide-badge{margin-top:8px;display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-soft);border:1px solid var(--accent-border);border-radius:var(--r-full);padding:3px 10px;}
+.btile-sq-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:18px;}
+.btile-sq-label{font-size:15px;font-weight:700;letter-spacing:-.01em;}
+.btile-sq-sub{font-size:10px;color:var(--text-3);margin-top:3px;}
+.btile-arrow{position:absolute;bottom:14px;right:16px;color:var(--text-3);font-size:13px;}
+/* 색상 */
+.ic-gold{background:var(--accent-soft);color:var(--accent);}
+.ic-blue{background:var(--blue-soft);color:var(--blue);}
+.ic-violet{background:var(--violet-soft);color:var(--violet);}
+.ic-green{background:var(--green-soft);color:var(--green);}
+/* ── 스탯 배너 ── */
+.stat-banner{display:flex;align-items:center;margin:12px 20px 0;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:var(--r-md);padding:10px 0;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);}
+.stat-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;}
+.sv{font-size:16px;font-weight:700;color:var(--accent);font-family:'IBM Plex Mono',monospace;line-height:1;}
+.sk{font-size:8px;color:var(--text-3);font-weight:600;letter-spacing:.06em;text-transform:uppercase;}
+.stat-div{width:1px;height:22px;background:var(--border);}
+/* ── 홈 푸터 ── */
+.home-footer{padding:16px 20px 8px;display:flex;align-items:center;justify-content:space-between;}
+.home-wordcount{font-size:11px;color:var(--text-3);font-weight:500;}
+.home-copy a{font-size:11px;color:rgba(255,255,255,.22);text-decoration:none;letter-spacing:.04em;font-weight:500;}
+.home-copy a:hover{color:rgba(255,255,255,.5);}
 .flash-body,.quiz-body,.typing-body{flex:1;display:flex;flex-direction:column;padding:16px;min-height:0;overflow-y:auto;gap:14px;}
 .flip-wrap{flex:1;perspective:1600px;cursor:pointer;min-height:0;}
 .flip-inner{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .55s var(--ease-spring);}
@@ -150,60 +166,71 @@ body{background:#050505;display:flex;align-items:center;justify-content:center;m
 <div id="app">
 <div id="app-bg"></div>
 <div id="homeScreen" class="screen active">
-  <!-- 상단 앱 헤더 -->
   <div class="home-header">
     <span class="home-appname">루아 히브리어 단어장</span>
-    <div class="home-xp-pill">⭐ <span id="homeXPTop">0</span></div>
+    <div class="home-xp-pill">⭐ <span id="homeXPTop">0</span> XP</div>
   </div>
-  <!-- 히어로 -->
   <div class="home-hero">
     <div class="hero-glyph">רוּחַ</div>
-    <div class="hero-title">히브리어 단어장</div>
+    <div class="hero-title">히브리어<br>단어장</div>
     <div class="hero-sub">RUAH HEBREW VOCABULARY</div>
   </div>
-  <!-- 스탯 바 -->
-  <div class="stat-row">
-    <div class="stat-item"><div class="sv" id="homeLv">1</div><div class="sk">레벨</div></div>
+  <!-- 벤토 그리드 -->
+  <div class="bento-grid">
+    <!-- 암기 — 와이드 -->
+    <div class="btile btile-wide" onclick="startMode('flash')">
+      <div class="btile-wide-icon ic-gold"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="3"/><line x1="8" y1="4" x2="8" y2="20"/><line x1="12" y1="9" x2="18" y2="9"/><line x1="12" y1="13" x2="16" y2="13"/></svg></div>
+      <div class="btile-wide-text">
+        <div class="btile-wide-label">암기</div>
+        <div class="btile-wide-sub">카드를 뒤집으며 단어 암기</div>
+        <div class="btile-wide-badge">플래시카드 →</div>
+      </div>
+    </div>
+    <!-- 퀴즈 -->
+    <div class="btile btile-sq" onclick="startMode('quiz')">
+      <div class="btile-sq-icon ic-blue"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="3" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="21"/><line x1="3" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="21" y2="12"/></svg></div>
+      <div class="btile-sq-label">퀴즈</div>
+      <div class="btile-sq-sub">4지선다</div>
+      <span class="btile-arrow">›</span>
+    </div>
+    <!-- 쓰기 -->
+    <div class="btile btile-sq" onclick="startMode('typing')">
+      <div class="btile-sq-icon ic-violet"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
+      <div class="btile-sq-label">쓰기</div>
+      <div class="btile-sq-sub">뜻 직접 입력</div>
+      <span class="btile-arrow">›</span>
+    </div>
+    <!-- 단어장 — 와이드 -->
+    <div class="btile btile-wide" style="grid-column:1/3;" onclick="gotoList()">
+      <div class="btile-wide-icon ic-green"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="13" y2="13"/></svg></div>
+      <div class="btile-wide-text">
+        <div class="btile-wide-label">단어장</div>
+        <div class="btile-wide-sub">전체 단어 검색 및 발음 확인</div>
+        <div class="btile-wide-badge" style="color:var(--green);background:var(--green-soft);border-color:var(--green-border);" id="totalWordCount">📖 201개 수록 →</div>
+      </div>
+    </div>
+  </div>
+  <!-- 스탯 배너 -->
+  <div class="stat-banner">
+    <div class="stat-item"><div class="sv" id="homeLv">1</div><div class="sk">Level</div></div>
     <div class="stat-div"></div>
     <div class="stat-item"><div class="sv" id="homeXP">0</div><div class="sk">XP</div></div>
     <div class="stat-div"></div>
     <div class="stat-item"><div class="sv" id="homeCorrect">0</div><div class="sk">정답</div></div>
     <div class="stat-div"></div>
-    <div class="stat-item"><div class="sv" id="homeStreak">0</div><div class="sk">연속최고</div></div>
+    <div class="stat-item"><div class="sv" id="homeStreak">0</div><div class="sk">최고연속</div></div>
   </div>
-  <!-- 단어 수 배지 -->
-  <div class="word-count-row">
-    <span class="word-count-badge" id="totalWordCount">📖 201개 단어 수록</span>
-  </div>
-  <!-- 모드 카드 -->
-  <div class="mode-grid">
-    <div class="mode-tile" onclick="startMode('flash')">
-      <div class="tile-icon gold"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="3"/><line x1="8" y1="4" x2="8" y2="20"/><line x1="12" y1="9" x2="18" y2="9"/><line x1="12" y1="13" x2="16" y2="13"/></svg></div>
-      <div class="tile-label">암기</div>
-      <div class="tile-sub">플래시카드</div>
-    </div>
-    <div class="mode-tile" onclick="startMode('quiz')">
-      <div class="tile-icon blue"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="3" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="21"/><line x1="3" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="21" y2="12"/></svg></div>
-      <div class="tile-label">퀴즈</div>
-      <div class="tile-sub">4지선다</div>
-    </div>
-    <div class="mode-tile" onclick="startMode('typing')">
-      <div class="tile-icon violet"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
-      <div class="tile-label">쓰기</div>
-      <div class="tile-sub">뜻 입력</div>
-    </div>
-    <div class="mode-tile" onclick="gotoList()">
-      <div class="tile-icon green"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="13" y2="13"/></svg></div>
-      <div class="tile-label">단어</div>
-      <div class="tile-sub">전체 목록</div>
-    </div>
+  <!-- 푸터 -->
+  <div class="home-footer">
+    <span class="home-wordcount">© 2026 루아 히브리어 단어장</span>
+    <div class="home-copy"><a href="https://ruahqt.onrender.com/" target="_blank" rel="noopener noreferrer">@RuahQT ↗</a></div>
   </div>
 </div>
-<div id="flashScreen" class="screen"><div class="topbar"><div class="back-btn" onclick="goHome()">←</div><div class="topbar-inner"><span class="topbar-appname">루아 히브리어 단어장</span><span class="topbar-title">플래시카드</span></div><div class="xp-pill">⭐ <span id="fXP">0</span></div></div><div class="hud-strip"><div class="hud-row"><span class="hud-label">경험치</span><span class="hud-val" id="fLevel">LV.1</span></div><div class="track"><div class="fill-xp" id="fXPFill" style="width:0%"></div></div><div class="streak-row"><span>🔥</span><div class="streak-pips"><div class="pip" id="fs0"></div><div class="pip" id="fs1"></div><div class="pip" id="fs2"></div><div class="pip" id="fs3"></div><div class="pip" id="fs4"></div></div><span class="streak-num" id="fStreakNum">0</span></div></div><div class="flash-body"><div class="flip-wrap" onclick="flipCard()"><div class="flip-inner" id="flipCard"><div class="flip-face front"><span class="face-tag" id="fTag">명사</span><span class="face-num" id="fNum">1 / 201</span><div class="face-hebrew" id="fHeb">בַּת</div><div class="face-roman" id="fRoman">[바트]</div><span class="face-hint">탭하여 뒤집기 ↻</span><div class="sound-btn" onclick="event.stopPropagation(); speakWord('front')">🔊</div></div><div class="flip-face back"><span class="face-tag" id="fTagBack">명사</span><div class="face-meaning" id="fMeaning">딸</div><div class="sound-btn" onclick="event.stopPropagation(); speakWord('back')">🔊</div></div></div></div><div class="flash-footer"><div class="know-row" id="knowBtns" style="display:none"><button class="know-btn no" onclick="flashResult(false)">✗ 몰랐어요</button><button class="know-btn yes" onclick="flashResult(true)">✓ 알았어요</button></div><div class="nav-row"><button class="nav-btn" onclick="prevFlash()">← 이전</button><span class="flash-ctr" id="fCounter">1 / 201</span><button class="nav-btn" onclick="nextFlash()">다음 →</button></div></div></div></div>
-<div id="quizScreen" class="screen"><div class="topbar"><div class="back-btn" onclick="goHome()">←</div><div class="topbar-inner"><span class="topbar-appname">루아 히브리어 단어장</span><span class="topbar-title">4지선다 퀴즈</span></div><div class="xp-pill">⭐ <span id="qXP">0</span></div></div><div class="hud-strip"><div class="hud-row"><span class="hud-label">경험치</span><span class="hud-val" id="qLevel">LV.1</span></div><div class="track"><div class="fill-xp" id="qXPFill" style="width:0%"></div></div><div class="hud-row" style="margin-top:4px"><span class="hud-label" id="qProgLabel">0 / 20</span><span style="font-size:12px;font-weight:700;color:var(--accent)" id="qScore">점수: 0</span></div><div class="track"><div class="fill-prog" id="qProgFill" style="width:0%"></div></div><div class="streak-row"><span>🔥</span><div class="streak-pips"><div class="pip" id="qs0"></div><div class="pip" id="qs1"></div><div class="pip" id="qs2"></div><div class="pip" id="qs3"></div><div class="pip" id="qs4"></div></div><span class="streak-num" id="qStreakNum">0</span></div></div><div class="quiz-body"><div class="q-card"><div class="q-hebrew" id="qHeb">בַּת</div><div class="q-roman" id="qRoman">[바트]</div><div class="sound-btn" style="position:absolute;bottom:16px;right:16px" onclick="speakCurrent()">🔊</div></div><div class="opts-grid" id="quizOpts"></div><div class="feedback-zone"><div class="feedback-msg" id="qFeedback"></div></div><button class="next-btn hidden" id="qNextBtn" onclick="nextQuiz()">다음 문제 →</button></div></div>
-<div id="typingScreen" class="screen"><div class="topbar"><div class="back-btn" onclick="goHome()">←</div><div class="topbar-inner"><span class="topbar-appname">루아 히브리어 단어장</span><span class="topbar-title">뜻 입력</span></div><div class="xp-pill">⭐ <span id="tXP">0</span></div></div><div class="hud-strip"><div class="hud-row"><span class="hud-label">경험치</span><span class="hud-val" id="tLevel">LV.1</span></div><div class="track"><div class="fill-xp" id="tXPFill" style="width:0%"></div></div><div class="hud-row" style="margin-top:4px"><span class="hud-label" id="tProgLabel">0 / 20</span><span style="font-size:12px;font-weight:700;color:var(--accent)" id="tScore">점수: 0</span></div><div class="track"><div class="fill-prog" id="tProgFill" style="width:0%"></div></div><div class="streak-row"><span>🔥</span><div class="streak-pips"><div class="pip" id="ts0"></div><div class="pip" id="ts1"></div><div class="pip" id="ts2"></div><div class="pip" id="ts3"></div><div class="pip" id="ts4"></div></div><span class="streak-num" id="tStreakNum">0</span></div></div><div class="typing-body"><div class="q-card"><div class="q-hebrew" id="tHeb">בַּת</div><div class="q-roman" id="tRoman">[바트]</div><div class="sound-btn" style="position:absolute;bottom:16px;right:16px" onclick="speakTyping()">🔊</div></div><div class="input-row"><input type="text" class="type-input" id="tInput" placeholder="한국어 뜻 입력..." onkeydown="if(event.key==='Enter')checkTyping()"><button class="confirm-btn" onclick="checkTyping()">✓</button></div><div class="hint-row"><button class="hint-btn" id="tHintBtn" onclick="showTypingHint()">💡 힌트 (-3 XP)</button><span class="hint-reveal" id="tHintText"></span></div><div class="feedback-zone"><div class="feedback-msg" id="tFeedback"></div></div><button class="next-btn hidden" id="tNextBtn" onclick="nextTyping()">다음 문제 →</button></div></div>
+<div id="flashScreen" class="screen"><div class="topbar"><div class="back-btn" onclick="goHome()">←</div><div class="topbar-inner"><span class="topbar-appname">루아 히브리어 단어장</span><span class="topbar-title">플래시카드</span></div><div class="xp-pill">⭐ <span id="fXP">0</span></div></div><div class="hud-strip"><div class="hud-row"><span class="hud-label">경험치</span><span class="hud-val" id="fLevel">LV.1</span></div><div class="track"><div class="fill-xp" id="fXPFill" style="width:0%"></div></div><div class="streak-row"><span>🔥</span><div class="streak-pips"><div class="pip" id="fs0"></div><div class="pip" id="fs1"></div><div class="pip" id="fs2"></div><div class="pip" id="fs3"></div><div class="pip" id="fs4"></div></div><span class="streak-num" id="fStreakNum">0</span></div></div><div class="flash-body"><div class="flip-wrap" onclick="flipCard()"><div class="flip-inner" id="flipCard"><div class="flip-face front"><span class="face-tag" id="fTag">명사</span><span class="face-num" id="fNum">1 / 201</span><div class="face-hebrew" id="fHeb">בַּת</div><div class="face-roman" id="fRoman">[바트]</div><span class="face-hint">탭하여 뒤집기 ↻</span><div class="sound-btn" onclick="event.stopPropagation(); speakWord('front')">🔊</div></div><div class="flip-face back"><span class="face-tag" id="fTagBack">명사</span><div class="face-meaning" id="fMeaning">딸</div><div class="sound-btn" onclick="event.stopPropagation(); speakWord('back')">🔊</div></div></div></div><div class="flash-footer"><div class="know-row" id="knowBtns" style="display:none"><button class="know-btn no" onclick="flashResult(false)">✗ 몰랐어요</button><button class="know-btn yes" onclick="flashResult(true)">✓ 알았어요</button></div><div class="nav-row"><button class="nav-btn" onclick="prevFlash()">← 이전</button><span class="flash-ctr" id="fCounter">1 / 201</span><button class="nav-btn" onclick="nextFlash()">다음 →</button></div></div><div style="text-align:center;padding:16px 0 4px;font-size:10px;color:rgba(255,255,255,.15);letter-spacing:.06em;font-weight:500;">© 2026 루아 히브리어 단어장</div></div></div>
+<div id="quizScreen" class="screen"><div class="topbar"><div class="back-btn" onclick="goHome()">←</div><div class="topbar-inner"><span class="topbar-appname">루아 히브리어 단어장</span><span class="topbar-title">4지선다 퀴즈</span></div><div class="xp-pill">⭐ <span id="qXP">0</span></div></div><div class="hud-strip"><div class="hud-row"><span class="hud-label">경험치</span><span class="hud-val" id="qLevel">LV.1</span></div><div class="track"><div class="fill-xp" id="qXPFill" style="width:0%"></div></div><div class="hud-row" style="margin-top:4px"><span class="hud-label" id="qProgLabel">0 / 20</span><span style="font-size:12px;font-weight:700;color:var(--accent)" id="qScore">점수: 0</span></div><div class="track"><div class="fill-prog" id="qProgFill" style="width:0%"></div></div><div class="streak-row"><span>🔥</span><div class="streak-pips"><div class="pip" id="qs0"></div><div class="pip" id="qs1"></div><div class="pip" id="qs2"></div><div class="pip" id="qs3"></div><div class="pip" id="qs4"></div></div><span class="streak-num" id="qStreakNum">0</span></div></div><div class="quiz-body"><div class="q-card"><div class="q-hebrew" id="qHeb">בַּת</div><div class="q-roman" id="qRoman">[바트]</div><div class="sound-btn" style="position:absolute;bottom:16px;right:16px" onclick="speakCurrent()">🔊</div></div><div class="opts-grid" id="quizOpts"></div><div class="feedback-zone"><div class="feedback-msg" id="qFeedback"></div></div><button class="next-btn hidden" id="qNextBtn" onclick="nextQuiz()">다음 문제 →</button><div style="text-align:center;padding:16px 0 4px;font-size:10px;color:rgba(255,255,255,.15);letter-spacing:.06em;font-weight:500;">© 2026 루아 히브리어 단어장</div></div></div>
+<div id="typingScreen" class="screen"><div class="topbar"><div class="back-btn" onclick="goHome()">←</div><div class="topbar-inner"><span class="topbar-appname">루아 히브리어 단어장</span><span class="topbar-title">뜻 입력</span></div><div class="xp-pill">⭐ <span id="tXP">0</span></div></div><div class="hud-strip"><div class="hud-row"><span class="hud-label">경험치</span><span class="hud-val" id="tLevel">LV.1</span></div><div class="track"><div class="fill-xp" id="tXPFill" style="width:0%"></div></div><div class="hud-row" style="margin-top:4px"><span class="hud-label" id="tProgLabel">0 / 20</span><span style="font-size:12px;font-weight:700;color:var(--accent)" id="tScore">점수: 0</span></div><div class="track"><div class="fill-prog" id="tProgFill" style="width:0%"></div></div><div class="streak-row"><span>🔥</span><div class="streak-pips"><div class="pip" id="ts0"></div><div class="pip" id="ts1"></div><div class="pip" id="ts2"></div><div class="pip" id="ts3"></div><div class="pip" id="ts4"></div></div><span class="streak-num" id="tStreakNum">0</span></div></div><div class="typing-body"><div class="q-card"><div class="q-hebrew" id="tHeb">בַּת</div><div class="q-roman" id="tRoman">[바트]</div><div class="sound-btn" style="position:absolute;bottom:16px;right:16px" onclick="speakTyping()">🔊</div></div><div class="input-row"><input type="text" class="type-input" id="tInput" placeholder="한국어 뜻 입력..." onkeydown="if(event.key==='Enter')checkTyping()"><button class="confirm-btn" onclick="checkTyping()">✓</button></div><div class="hint-row"><button class="hint-btn" id="tHintBtn" onclick="showTypingHint()">💡 힌트 (-3 XP)</button><span class="hint-reveal" id="tHintText"></span></div><div class="feedback-zone"><div class="feedback-msg" id="tFeedback"></div></div><button class="next-btn hidden" id="tNextBtn" onclick="nextTyping()">다음 문제 →</button><div style="text-align:center;padding:16px 0 4px;font-size:10px;color:rgba(255,255,255,.15);letter-spacing:.06em;font-weight:500;">© 2026 루아 히브리어 단어장</div></div></div>
 <div id="resultScreen" class="screen"><div class="result-icon" id="rEmoji">🏆</div><div class="result-head" id="rTitle">완벽해요!</div><div class="result-fraction" id="rScore">10/10</div><div class="result-info" id="rSub"></div><div class="badge-wrap" id="rBadges"></div><button class="r-btn primary" onclick="restartCurrent()">🔄 다시 하기</button><button class="r-btn secondary" onclick="goHome()">🏠 홈으로</button></div>
-<div id="listScreen" class="screen"><div class="topbar"><div class="back-btn" onclick="goHome()">←</div><div class="topbar-inner"><span class="topbar-appname">루아 히브리어 단어장</span><span class="topbar-title">전체 단어장</span></div><div style="width:36px"></div></div><div class="search-wrap"><input type="text" class="search-input" id="listSearch" placeholder="🔍 한국어 또는 히브리어 검색..." oninput="filterList()"></div><div class="filter-bar"><div class="chip active" data-tag="전체" onclick="setTagFilter(this)">전체</div><div class="chip" data-tag="명사" onclick="setTagFilter(this)">명사</div><div class="chip" data-tag="동사" onclick="setTagFilter(this)">동사</div><div class="chip" data-tag="형용사" onclick="setTagFilter(this)">형용사</div><div class="chip" data-tag="대명사" onclick="setTagFilter(this)">대명사</div><div class="chip" data-tag="전치사" onclick="setTagFilter(this)">전치사</div><div class="chip" data-tag="접속사" onclick="setTagFilter(this)">접속사</div></div><div class="word-scroll" id="wordList"></div></div>
+<div id="listScreen" class="screen"><div class="topbar"><div class="back-btn" onclick="goHome()">←</div><div class="topbar-inner"><span class="topbar-appname">루아 히브리어 단어장</span><span class="topbar-title">전체 단어장</span></div><div style="width:36px"></div></div><div class="search-wrap"><input type="text" class="search-input" id="listSearch" placeholder="🔍 한국어 또는 히브리어 검색..." oninput="filterList()"></div><div class="filter-bar"><div class="chip active" data-tag="전체" onclick="setTagFilter(this)">전체</div><div class="chip" data-tag="명사" onclick="setTagFilter(this)">명사</div><div class="chip" data-tag="동사" onclick="setTagFilter(this)">동사</div><div class="chip" data-tag="형용사" onclick="setTagFilter(this)">형용사</div><div class="chip" data-tag="대명사" onclick="setTagFilter(this)">대명사</div><div class="chip" data-tag="전치사" onclick="setTagFilter(this)">전치사</div><div class="chip" data-tag="접속사" onclick="setTagFilter(this)">접속사</div></div><div class="word-scroll" id="wordList"></div><div style="text-align:center;padding:16px 0 4px;font-size:10px;color:rgba(255,255,255,.15);letter-spacing:.06em;font-weight:500;">© 2026 루아 히브리어 단어장</div></div>
 <div id="bottomDock">
   <button class="dock-btn active" id="dockFlash" onclick="dockNav('flash')">
     <span class="di"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="3"/><line x1="8" y1="4" x2="8" y2="20"/><line x1="12" y1="9" x2="18" y2="9"/><line x1="12" y1="13" x2="16" y2="13"/></svg></span><span class="dl">암기</span>
@@ -231,7 +258,7 @@ function loadState(){try{const s=JSON.parse(localStorage.getItem('hbState2')||'{
 function saveState(){try{localStorage.setItem('hbState2',JSON.stringify({xp:state.xp,maxStreak:state.maxStreak,correct:state.correct,streak:state.streak,fcIdx:state.fcIdx}));}catch(e){}}
 function getLevel(){return Math.floor(state.xp/XP_PER_LVL)+1;}
 function updateXPUI(p){const lv=getLevel(),pct=((state.xp%XP_PER_LVL)/XP_PER_LVL)*100;document.getElementById(p+'XP').textContent=state.xp;document.getElementById(p+'Level').textContent='LV.'+lv;document.getElementById(p+'XPFill').style.width=pct+'%';document.getElementById(p+'StreakNum').textContent=state.streak;for(let i=0;i<5;i++){const on=i<(state.streak%5||(state.streak>0&&state.streak%5===0?5:0));document.getElementById(p+'s'+i).className='pip'+(on?' on':'');}}
-function updateHomeStats(){document.getElementById('homeLv').textContent=getLevel();document.getElementById('homeXP').textContent=state.xp;document.getElementById('homeCorrect').textContent=state.correct;document.getElementById('homeStreak').textContent=state.maxStreak;document.getElementById('totalWordCount').textContent='📖 '+WORDS.length+'개 단어 수록';const xpTop=document.getElementById('homeXPTop');if(xpTop)xpTop.textContent=state.xp;}
+function updateHomeStats(){document.getElementById('homeLv').textContent=getLevel();document.getElementById('homeXP').textContent=state.xp;document.getElementById('homeCorrect').textContent=state.correct;document.getElementById('homeStreak').textContent=state.maxStreak;document.getElementById('totalWordCount').textContent='📖 '+WORDS.length+'개 수록 →';const xpTop=document.getElementById('homeXPTop');if(xpTop)xpTop.textContent=state.xp;}
 function addXP(n){state.xp+=n;saveState();} function incStreak(){state.streak++;state.correct++;if(state.streak>state.maxStreak)state.maxStreak=state.streak;saveState();} function resetStreak(){state.streak=0;saveState();}
 function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 function setScreen(id){
