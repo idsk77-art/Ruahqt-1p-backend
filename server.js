@@ -5,19 +5,16 @@ const rateLimit = require('express-rate-limit');
 const app = express();
 const PORT = process.env.PORT || 3001;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const UNSPLASH_ACCESS_KEY = process.env.UNSPLASH_ACCESS_KEY;
 
-// ─── 미들웨어 ─────────────────────────────────────────────────────
 app.use(cors({
   origin: process.env.CLIENT_URL || '*',
   methods: ['GET', 'POST'],
 }));
 
-// Render는 프록시 서버이므로 trust proxy 설정 필수
 app.set('trust proxy', 1);
-
 app.use(express.json());
 
-// Rate limiting: IP당 1분에 10회
 const limiter = rateLimit({
   windowMs: 60 * 1000,
   max: 10,
@@ -27,7 +24,6 @@ const limiter = rateLimit({
 });
 app.use('/api/', limiter);
 
-// ─── 헬스체크 ─────────────────────────────────────────────────────
 app.get('/health', (req, res) => res.json({ status: 'ok', name: 'verse-craft-api' }));
 
 // ─── 말씀 검색 API ────────────────────────────────────────────────
@@ -56,29 +52,30 @@ app.post('/api/verse', async (req, res) => {
   }
 });
 
-// ─── 배경 이미지 생성 API ─────────────────────────────────────────
-app.post('/api/image', async (req, res) => {
-  const { prompt } = req.body;
-  if (!prompt) return res.status(400).json({ error: 'prompt가 필요합니다.' });
-  if (!GEMINI_API_KEY) return res.status(500).json({ error: 'API 키가 설정되지 않았습니다.' });
+// ─── 배경 이미지 API (Unsplash) ───────────────────────────────────
+app.get('/api/image', async (req, res) => {
+  if (!UNSPLASH_ACCESS_KEY) return res.status(500).json({ error: 'Unsplash 키가 설정되지 않았습니다.' });
+
+  // 자연/감성 키워드 랜덤 선택
+  const keywords = ['nature', 'sky', 'forest', 'sunrise', 'mountains', 'ocean', 'flowers', 'peaceful', 'light', 'clouds'];
+  const keyword = keywords[Math.floor(Math.random() * keywords.length)];
 
   try {
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${GEMINI_API_KEY}`,
+      `https://api.unsplash.com/photos/random?query=${keyword}&orientation=portrait&content_filter=high`,
       {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          instances: [{ prompt }],
-          parameters: { sampleCount: 1 }
-        })
+        headers: { Authorization: `Client-ID ${UNSPLASH_ACCESS_KEY}` }
       }
     );
     const data = await response.json();
-    res.json(data);
+    if (data.urls?.regular) {
+      res.json({ imageUrl: data.urls.regular });
+    } else {
+      throw new Error('이미지를 가져오지 못했습니다.');
+    }
   } catch (err) {
     console.error('[image error]', err);
-    res.status(500).json({ error: '이미지 생성 중 오류가 발생했습니다.' });
+    res.status(500).json({ error: '이미지를 가져오는 중 오류가 발생했습니다.' });
   }
 });
 
