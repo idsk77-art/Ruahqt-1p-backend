@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Ruah Clock</title>
+<style>
+  :root {
+    --bg:#000;
+    --color:#888888;
+    --font:Arial,sans-serif;
+    --pos-x:50;
+    --pos-y:48;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    background:var(--bg);color:var(--color);font-family:var(--font);
+    width:100vw;height:100vh;overflow:hidden;position:relative;
+  }
+  button,input,select{font-family:inherit;}
+
+  .clock{
+    position:absolute;
+    transform:translate(-50%,-50%);
+    left:calc(var(--pos-x)*1%);
+    top:calc(var(--pos-y)*1%);
+    text-align:center;
+    display:flex;flex-direction:column;align-items:center;gap:10px;
+    user-select:none;
+  }
+  /* 폰트 크기는 JS가 직접 px로 계산해서 inline style로 주입 */
+  .date-line{letter-spacing:1px;opacity:0.75;white-space:nowrap;}
+  .time-line{font-weight:300;font-variant-numeric:tabular-nums;letter-spacing:2px;line-height:1;white-space:nowrap;}
+  .tz-line-wrap{
+    display:flex;align-items:center;gap:12px;
+    opacity:0.55;letter-spacing:0.5px;
+    flex-wrap:wrap;justify-content:center;white-space:nowrap;
+  }
+  .ruah-link{color:var(--color);text-decoration:none;opacity:0.8;letter-spacing:1px;}
+  .ruah-link:hover{opacity:1;text-decoration:underline;}
+
+  .fab-group{position:fixed;top:18px;right:18px;display:flex;gap:8px;z-index:50;}
+  .fab{
+    width:36px;height:36px;background:none;border:none;color:var(--color);
+    cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;
+    opacity:0.5;transition:opacity 0.2s;padding:0;border-radius:6px;
+  }
+  .fab:hover{opacity:0.9;} .fab.active{opacity:0.95;}
+
+  .panel{
+    position:fixed;top:62px;right:18px;width:290px;
+    background:rgba(18,18,18,0.96);border:1px solid rgba(255,255,255,0.12);
+    border-radius:16px;padding:18px;backdrop-filter:blur(12px);
+    z-index:40;display:none;color:var(--color);
+  }
+  .panel.show{display:block;}
+  .panel-title{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:0.45;margin-bottom:14px;}
+  .sec{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;opacity:0.35;margin:12px 0 8px;}
+  .sg{margin-bottom:11px;}
+  .sg label{display:block;font-size:11px;opacity:0.55;margin-bottom:5px;}
+  .sr{display:flex;gap:7px;align-items:center;}
+  input[type="text"],select{
+    flex:1;background:rgba(255,255,255,0.06);color:var(--color);
+    border:1px solid rgba(255,255,255,0.12);border-radius:8px;
+    padding:7px 10px;font-size:13px;outline:none;width:100%;
+  }
+  input[type="text"]:focus,select:focus{border-color:rgba(180,180,180,0.5);}
+  select option{background:#1a1a1a;color:#ccc;}
+  input[type="color"]{
+    width:38px;height:34px;border:1px solid rgba(255,255,255,0.12);
+    border-radius:7px;background:none;cursor:pointer;padding:2px;flex-shrink:0;
+  }
+  input[type="range"]{flex:1;accent-color:#888;cursor:pointer;}
+  .badge{min-width:52px;text-align:right;font-size:11px;opacity:0.6;}
+  hr.dv{border:none;border-top:1px solid rgba(255,255,255,0.07);margin:12px 0;}
+  .btn-row{display:flex;gap:8px;margin-top:14px;}
+  .btn{flex:1;border:none;border-radius:8px;padding:6px 8px;cursor:pointer;font-size:12px;transition:opacity 0.15s;}
+  .btn:hover{opacity:0.8;}
+  .btn-p{background:#888;color:#000;}
+  .btn-g{background:rgba(255,255,255,0.08);color:var(--color);border:1px solid rgba(255,255,255,0.12);}
+
+  .search-wrap{position:relative;margin-bottom:10px;}
+  .search-row{display:flex;gap:7px;}
+  .sugs{
+    position:absolute;left:0;right:60px;top:41px;
+    background:#111;border:1px solid rgba(255,255,255,0.12);
+    border-radius:10px;overflow-y:auto;max-height:200px;display:none;z-index:5;
+  }
+  .sug{padding:9px 12px;font-size:13px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.06);}
+  .sug:last-child{border-bottom:none;}
+  .sug:hover{background:rgba(255,255,255,0.08);}
+  .sug small{opacity:0.4;font-size:11px;}
+</style>
+</head>
+<body>
+
+<div class="fab-group">
+  <button class="fab" id="fabFS"  title="전체화면">⛶</button>
+  <button class="fab" id="fabCfg" title="환경설정">⚙</button>
+  <button class="fab" id="fabSch" title="세계시간" style="filter:grayscale(1)">🌐</button>
+</div>
+
+<div class="panel" id="pCfg">
+  <div class="panel-title">환경설정</div>
+  <div class="sec">색상 · 폰트</div>
+  <div class="sg">
+    <label>폰트 컬러</label>
+    <div class="sr">
+      <input type="color" id="cPick" value="#888888"/>
+      <input type="text"  id="cHex"  value="#888888" maxlength="7"/>
+    </div>
+  </div>
+  <div class="sg">
+    <label>폰트</label>
+    <select id="fSel">
+      <option value="'Segoe UI','Apple SD Gothic Neo','Malgun Gothic',sans-serif">기본 (시스템)</option>
+      <option value="Arial,sans-serif" selected>Arial</option>
+      <option value="Verdana,sans-serif">Verdana</option>
+      <option value="Tahoma,sans-serif">Tahoma</option>
+      <option value="'Trebuchet MS',sans-serif">Trebuchet MS</option>
+      <option value="Georgia,serif">Georgia</option>
+      <option value="'Times New Roman',serif">Times New Roman</option>
+      <option value="'Courier New',monospace">Courier New</option>
+    </select>
+  </div>
+  <hr class="dv"/>
+  <div class="sec">글자 크기 (px)</div>
+  <div class="sg">
+    <label>시간 크기</label>
+    <div class="sr">
+      <input type="range" id="rTime" min="30" max="500" step="1" value="130"/>
+      <span class="badge" id="bTime">130px</span>
+    </div>
+  </div>
+  <div class="sg">
+    <label>날짜 크기</label>
+    <div class="sr">
+      <input type="range" id="rDate" min="10" max="80" step="1" value="22"/>
+      <span class="badge" id="bDate">22px</span>
+    </div>
+  </div>
+  <hr class="dv"/>
+  <div class="sec">위치</div>
+  <div class="sg">
+    <label>좌우</label>
+    <div class="sr">
+      <span style="font-size:11px;opacity:.4;flex-shrink:0">←</span>
+      <input type="range" id="rX" min="5" max="95" value="50"/>
+      <span style="font-size:11px;opacity:.4;flex-shrink:0">→</span>
+      <span class="badge" id="bX" title="클릭 시 50% 초기화" style="cursor:pointer">50%</span>
+    </div>
+  </div>
+  <div class="sg">
+    <label>상하</label>
+    <div class="sr">
+      <span style="font-size:11px;opacity:.4;flex-shrink:0">↑</span>
+      <input type="range" id="rY" min="5" max="95" value="48"/>
+      <span style="font-size:11px;opacity:.4;flex-shrink:0">↓</span>
+      <span class="badge" id="bY" title="클릭 시 48% 초기화" style="cursor:pointer">48%</span>
+    </div>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-p" id="btnSave">저장</button>
+    <button class="btn btn-g" id="btnReset">기본값</button>
+  </div>
+</div>
+
+<div class="panel" id="pSch">
+  <div class="panel-title">세계시간</div>
+  <div class="search-wrap">
+    <div class="search-row">
+      <input type="text" id="cInput" placeholder="나라 입력 (예: 미국, 일본)" autocomplete="off"/>
+      <button class="btn btn-p" id="btnGo" style="width:52px;flex-shrink:0">보기</button>
+    </div>
+    <div class="sugs" id="sugs"></div>
+  </div>
+  <button class="btn btn-g" id="btnSeoul" style="width:100%">🇰🇷 서울 시간으로 돌아가기</button>
+</div>
+
+<div class="clock">
+  <div class="date-line" id="dLine"></div>
+  <div class="time-line" id="tLine"></div>
+  <div class="tz-line-wrap" id="tzWrap">
+    <span id="tzLine"></span>
+    <a href="https://ruahqt.onrender.com/" target="_blank" class="ruah-link">@RuahQT</a>
+  </div>
+</div>
+
+<script>
+const COUNTRIES=[
+  {ko:'한국',aliases:['대한민국'],name:'South Korea',tz:'Asia/Seoul'},
+  {ko:'일본',aliases:[],name:'Japan',tz:'Asia/Tokyo'},
+  {ko:'중국',aliases:['중화인민공화국'],name:'China',tz:'Asia/Shanghai'},
+  {ko:'대만',aliases:['타이완'],name:'Taiwan',tz:'Asia/Taipei'},
+  {ko:'홍콩',aliases:[],name:'Hong Kong',tz:'Asia/Hong_Kong'},
+  {ko:'싱가포르',aliases:[],name:'Singapore',tz:'Asia/Singapore'},
+  {ko:'태국',aliases:[],name:'Thailand',tz:'Asia/Bangkok'},
+  {ko:'베트남',aliases:[],name:'Vietnam',tz:'Asia/Ho_Chi_Minh'},
+  {ko:'인도네시아',aliases:[],name:'Indonesia',tz:'Asia/Jakarta'},
+  {ko:'필리핀',aliases:[],name:'Philippines',tz:'Asia/Manila'},
+  {ko:'말레이시아',aliases:[],name:'Malaysia',tz:'Asia/Kuala_Lumpur'},
+  {ko:'인도',aliases:[],name:'India',tz:'Asia/Kolkata'},
+  {ko:'파키스탄',aliases:[],name:'Pakistan',tz:'Asia/Karachi'},
+  {ko:'방글라데시',aliases:[],name:'Bangladesh',tz:'Asia/Dhaka'},
+  {ko:'아랍에미리트',aliases:['UAE','두바이'],name:'UAE',tz:'Asia/Dubai'},
+  {ko:'사우디아라비아',aliases:['사우디'],name:'Saudi Arabia',tz:'Asia/Riyadh'},
+  {ko:'이스라엘',aliases:[],name:'Israel',tz:'Asia/Jerusalem'},
+  {ko:'영국',aliases:['잉글랜드'],name:'United Kingdom',tz:'Europe/London'},
+  {ko:'프랑스',aliases:[],name:'France',tz:'Europe/Paris'},
+  {ko:'독일',aliases:[],name:'Germany',tz:'Europe/Berlin'},
+  {ko:'이탈리아',aliases:[],name:'Italy',tz:'Europe/Rome'},
+  {ko:'스페인',aliases:[],name:'Spain',tz:'Europe/Madrid'},
+  {ko:'포르투갈',aliases:[],name:'Portugal',tz:'Europe/Lisbon'},
+  {ko:'네덜란드',aliases:['홀란드'],name:'Netherlands',tz:'Europe/Amsterdam'},
+  {ko:'스위스',aliases:[],name:'Switzerland',tz:'Europe/Zurich'},
+  {ko:'러시아',aliases:[],name:'Russia',tz:'Europe/Moscow'},
+  {ko:'터키',aliases:['튀르키예'],name:'Turkey',tz:'Europe/Istanbul'},
+  {ko:'미국',aliases:['미합중국','뉴욕'],name:'United States',tz:'America/New_York'},
+  {ko:'캐나다',aliases:[],name:'Canada',tz:'America/Toronto'},
+  {ko:'멕시코',aliases:[],name:'Mexico',tz:'America/Mexico_City'},
+  {ko:'브라질',aliases:[],name:'Brazil',tz:'America/Sao_Paulo'},
+  {ko:'아르헨티나',aliases:[],name:'Argentina',tz:'America/Argentina/Buenos_Aires'},
+  {ko:'칠레',aliases:[],name:'Chile',tz:'America/Santiago'},
+  {ko:'호주',aliases:['오스트레일리아','시드니'],name:'Australia',tz:'Australia/Sydney'},
+  {ko:'뉴질랜드',aliases:[],name:'New Zealand',tz:'Pacific/Auckland'},
+  {ko:'이집트',aliases:[],name:'Egypt',tz:'Africa/Cairo'},
+  {ko:'케냐',aliases:[],name:'Kenya',tz:'Africa/Nairobi'},
+  {ko:'남아프리카공화국',aliases:['남아공'],name:'South Africa',tz:'Africa/Johannesburg'}
+];
+
+const DEF={color:'#888888',font:'Arial,sans-serif',timePx:130,datePx:22,posX:50,posY:48};
+const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const root=document.documentElement;
+let curTz='Asia/Seoul', curName='South Korea';
+
+/* 현재 설정값 캐시 */
+let _curTimePx = 130, _curDatePx = 22;
+
+function applyFontSizes(timePx, datePx){
+  _curTimePx = timePx;
+  _curDatePx = datePx;
+  // 먼저 원하는 크기 그대로 적용
+  document.querySelector('.time-line').style.fontSize = timePx + 'px';
+  document.querySelector('.date-line').style.fontSize = datePx + 'px';
+  document.getElementById('tzWrap').style.fontSize   = Math.max(12, datePx * 0.6) + 'px';
+  // 렌더 후 실제 너비 측정해서 scale로 보정
+  requestAnimationFrame(fitClock);
+}
+
+function fitClock(){
+  const clock = document.querySelector('.clock');
+  // scale 초기화 후 실제 크기 측정
+  clock.style.transform = 'translate(-50%,-50%) scale(1)';
+  const cw = clock.scrollWidth;
+  const ch = clock.scrollHeight;
+  const vw = window.innerWidth  * 0.92;
+  const vh = window.innerHeight * 0.85;
+  const scale = Math.min(1, vw / cw, vh / ch);
+  clock.style.transform = 'translate(-50%,-50%) scale(' + scale + ')';
+}
+
+function tzAbbr(tz){
+  return new Intl.DateTimeFormat('en',{timeZone:tz,timeZoneName:'short'}).format(new Date()).split(', ').pop().split(' ').pop();
+}
+
+function tick(){
+  const p={};
+  new Intl.DateTimeFormat('en-US',{timeZone:curTz,year:'numeric',month:'numeric',day:'numeric',
+    weekday:'long',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false
+  }).formatToParts(new Date()).forEach(x=>{if(x.type!=='literal')p[x.type]=x.value;});
+  document.getElementById('dLine').textContent=`${p.weekday}, ${MONTHS[+p.month-1]} ${+p.day}, ${p.year}`;
+  const h=p.hour==='24'?'00':p.hour;
+  document.getElementById('tLine').textContent=`${h}:${p.minute}:${p.second}`;
+  document.getElementById('tzLine').textContent=`${curName}  ·  ${curTz}  (${tzAbbr(curTz)})`;
+}
+
+function loadS(){try{return{...DEF,...JSON.parse(localStorage.getItem('wc5')||'{}')};}catch(e){return{...DEF};}}
+
+function applyS(s){
+  root.style.setProperty('--color',s.color);
+  root.style.setProperty('--font',s.font);
+  root.style.setProperty('--pos-x',s.posX);
+  root.style.setProperty('--pos-y',s.posY);
+  applyFontSizes(s.timePx, s.datePx);
+
+  document.getElementById('cPick').value=s.color;
+  document.getElementById('cHex').value=s.color;
+  document.getElementById('fSel').value=s.font;
+  document.getElementById('rTime').value=s.timePx;
+  document.getElementById('rDate').value=s.datePx;
+  document.getElementById('rX').value=s.posX;
+  document.getElementById('rY').value=s.posY;
+  document.getElementById('bTime').textContent=s.timePx+'px';
+  document.getElementById('bDate').textContent=s.datePx+'px';
+  document.getElementById('bX').textContent=s.posX+'%';
+  document.getElementById('bY').textContent=s.posY+'%';
+}
+
+function readF(){
+  const hex=document.getElementById('cHex').value.trim();
+  return{
+    color:/^#[0-9a-fA-F]{6}$/.test(hex)?hex:document.getElementById('cPick').value,
+    font:document.getElementById('fSel').value,
+    timePx:+document.getElementById('rTime').value,
+    datePx:+document.getElementById('rDate').value,
+    posX:+document.getElementById('rX').value,
+    posY:+document.getElementById('rY').value
+  };
+}
+
+/* 창 크기 바뀌면 현재 적용 중인 값 기준으로 재계산 */
+window.addEventListener('resize',()=>{
+  applyFontSizes(_curTimePx, _curDatePx);
+  requestAnimationFrame(fitClock);
+});
+
+function showPanel(id){
+  ['pCfg','pSch'].forEach(pid=>{
+    const el=document.getElementById(pid);
+    if(pid===id) el.classList.toggle('show'); else el.classList.remove('show');
+  });
+  document.getElementById('fabCfg').classList.toggle('active',document.getElementById('pCfg').classList.contains('show'));
+  document.getElementById('fabSch').classList.toggle('active',document.getElementById('pSch').classList.contains('show'));
+}
+function closePanels(){
+  ['pCfg','pSch'].forEach(id=>document.getElementById(id).classList.remove('show'));
+  document.getElementById('fabCfg').classList.remove('active');
+  document.getElementById('fabSch').classList.remove('active');
+}
+
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.panel')&&!e.target.closest('.fab-group')) closePanels();
+  if(!e.target.closest('.search-wrap')) document.getElementById('sugs').style.display='none';
+});
+document.getElementById('fabCfg').addEventListener('click',e=>{e.stopPropagation();showPanel('pCfg');});
+document.getElementById('fabSch').addEventListener('click',e=>{e.stopPropagation();showPanel('pSch');});
+document.getElementById('fabFS').addEventListener('click',e=>{
+  e.stopPropagation();
+  !document.fullscreenElement?document.documentElement.requestFullscreen().catch(()=>{}):document.exitFullscreen();
+});
+document.addEventListener('fullscreenchange',()=>{
+  document.getElementById('fabFS').textContent=document.fullscreenElement?'✕':'⛶';
+});
+
+/* 슬라이더 미리보기 (실시간) */
+document.getElementById('cPick').addEventListener('input',function(){document.getElementById('cHex').value=this.value;applyS(readF());});
+document.getElementById('cHex').addEventListener('input',()=>{
+  const v=document.getElementById('cHex').value.trim();
+  if(/^#[0-9a-fA-F]{6}$/.test(v)) document.getElementById('cPick').value=v;
+  applyS(readF());
+});
+document.getElementById('fSel').addEventListener('change',()=>applyS(readF()));
+[['rTime','bTime','px'],['rDate','bDate','px'],['rX','bX','%'],['rY','bY','%']].forEach(([id,bid,u])=>{
+  document.getElementById(id).addEventListener('input',function(){
+    document.getElementById(bid).textContent=this.value+u;
+    applyS(readF());
+  });
+});
+
+document.getElementById('btnSave').addEventListener('click',()=>{
+  const s=readF();
+  localStorage.setItem('wc5',JSON.stringify(s));
+  closePanels();
+});
+document.getElementById('btnReset').addEventListener('click',()=>applyS({...DEF}));
+
+document.getElementById('bX').addEventListener('click',()=>{
+  document.getElementById('rX').value=50; document.getElementById('bX').textContent='50%'; applyS(readF());
+});
+document.getElementById('bY').addEventListener('click',()=>{
+  document.getElementById('rY').value=48; document.getElementById('bY').textContent='48%'; applyS(readF());
+});
+
+/* Search */
+function norm(v){return(v||'').trim().toLowerCase();}
+function findC(q){q=norm(q);return COUNTRIES.find(c=>norm(c.ko)===q||(c.aliases||[]).some(a=>norm(a)===q)||norm(c.ko).includes(q)||(c.aliases||[]).some(a=>norm(a).includes(q)));}
+function goC(f){
+  curTz=f.tz; curName=f.name;
+  document.getElementById('cInput').value=f.ko;
+  document.getElementById('sugs').style.display='none';
+  localStorage.setItem('wc5_tz', JSON.stringify({tz:f.tz, name:f.name, ko:f.ko}));
+  closePanels();
+  tick();
+}
+document.getElementById('btnGo').addEventListener('click',()=>{const f=findC(document.getElementById('cInput').value);f?goC(f):alert('나라를 찾지 못했습니다.');});
+document.getElementById('cInput').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('btnGo').click();});
+document.getElementById('cInput').addEventListener('input',function(){
+  const q=norm(this.value),box=document.getElementById('sugs');
+  if(!q){box.style.display='none';return;}
+  const m=COUNTRIES.filter(c=>norm(c.ko).includes(q)||(c.aliases||[]).some(a=>norm(a).includes(q))).slice(0,8);
+  if(!m.length){box.style.display='none';return;}
+  box.innerHTML=m.map(c=>`<div class="sug" data-ko="${c.ko}">${c.ko} <small>${c.name}</small></div>`).join('');
+  box.style.display='block';
+});
+document.getElementById('sugs').addEventListener('click',e=>{const i=e.target.closest('.sug');if(i){const f=findC(i.dataset.ko);if(f)goC(f);}});
+document.getElementById('btnSeoul').addEventListener('click',()=>{
+  curTz='Asia/Seoul'; curName='South Korea';
+  document.getElementById('cInput').value='';
+  localStorage.removeItem('wc5_tz');
+  tick();
+});
+
+applyS(loadS());
+
+// 저장된 세계시간 복원
+(function(){
+  try{
+    const saved = JSON.parse(localStorage.getItem('wc5_tz')||'null');
+    if(saved && saved.tz && saved.name){
+      curTz = saved.tz;
+      curName = saved.name;
+      document.getElementById('cInput').value = saved.ko || '';
+    }
+  }catch(e){}
+})();
+
+tick();
+setInterval(tick,1000);
+</script>
+</body>
+</html>
