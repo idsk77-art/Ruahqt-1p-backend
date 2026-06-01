@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Verse Craft 🌿 말씀카드 메이커</title>
+  <title>Ruah Verse Craft 🌿 말씀카드 메이커</title>
   <meta name="description" content="나만의 아름답고 은혜로운 성경 구절 카드를 만들어보세요." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -132,7 +132,7 @@
 
     <!-- 헤더 -->
     <div class="section">
-      <h1 class="text-2xl font-bold text-white mb-1">Verse Craft 🌿</h1>
+      <h1 class="text-2xl font-bold text-white mb-1">Ruah Verse Craft 🌿</h1>
       <p class="text-sm" style="color:#9ca3af">나만의 아름답고 은혜로운 성경 구절 카드를 만들어보세요.</p>
     </div>
 
@@ -265,7 +265,7 @@
           <div id="display-ref-en"
             style="font-family:Georgia,serif;font-size:8px;opacity:.85;color:#d1d5db;white-space:nowrap"></div>
         </div>
-        <div id="card-watermark">VerseCraft</div>
+        <div id="card-watermark">RuahQT</div>
       </div>
     </div>
 
@@ -520,7 +520,7 @@ async function handleDownload() {
       style: { transform: 'none' }
     });
     const d    = new Date();
-    const name = `VerseCraft${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}${Math.random().toString(36).slice(2,6)}.jpg`;
+    const name = `RuahQT${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}${Math.random().toString(36).slice(2,6)}.jpg`;
     const a    = document.createElement('a');
     a.href = dataUrl; a.download = name; a.click();
   } catch (e) {
