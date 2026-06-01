@@ -11,6 +11,10 @@ app.use(cors({
   origin: process.env.CLIENT_URL || '*',
   methods: ['GET', 'POST'],
 }));
+
+// Render는 프록시 서버이므로 trust proxy 설정 필수
+app.set('trust proxy', 1);
+
 app.use(express.json());
 
 // Rate limiting: IP당 1분에 10회
@@ -23,7 +27,7 @@ const limiter = rateLimit({
 });
 app.use('/api/', limiter);
 
-// ─── 헬스체크 (Render 필수) ───────────────────────────────────────
+// ─── 헬스체크 ─────────────────────────────────────────────────────
 app.get('/health', (req, res) => res.json({ status: 'ok', name: 'verse-craft-api' }));
 
 // ─── 말씀 검색 API ────────────────────────────────────────────────
