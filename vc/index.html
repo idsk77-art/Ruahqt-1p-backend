@@ -200,7 +200,7 @@
       <!-- AI 이미지 생성 -->
       <div style="padding-top:16px; border-top:1px solid #1f2937">
         <button id="img-btn" class="btn btn-primary" onclick="handleGenerateImage()">
-          🖼️ AI 감성 배경 이미지 생성하기
+          🖼️ 감성 배경 이미지 가져오기
         </button>
       </div>
     </div>
@@ -463,27 +463,30 @@ async function handleSearchVerse() {
   }
 }
 
-// ── AI 배경 이미지 생성 ───────────────────────────────
+// ── 배경 이미지 가져오기 (Unsplash) ──────────────────
 async function handleGenerateImage() {
   const btn = document.getElementById('img-btn');
   btn.disabled = true;
-  btn.textContent = '이미지 생성 중 (약 10초)...';
+  btn.textContent = '이미지 불러오는 중...';
   try {
-    const prompt = 'A beautiful, serene, peaceful nature background. Vertical 9:16 composition, soft natural lighting, sky or landscape. NO TEXT, NO WORDS, NO LETTERS anywhere in the image.';
-    const result = await callAPI('/api/image', { prompt });
-    if (result.predictions?.[0]) {
-      const url = 'data:image/png;base64,' + result.predictions[0].bytesBase64Encoded;
-      document.getElementById('card-bg').style.backgroundImage = `url(${url})`;
+    const res = await fetch(API_BASE + '/api/image');
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'HTTP ' + res.status);
+    }
+    const result = await res.json();
+    if (result.imageUrl) {
+      document.getElementById('card-bg').style.backgroundImage = `url(${result.imageUrl})`;
       document.getElementById('card-bg').style.filter = 'blur(12px)';
     } else {
-      throw new Error(result.error?.message || '이미지 데이터를 받지 못했습니다.');
+      throw new Error(result.error || '이미지를 가져오지 못했습니다.');
     }
   } catch (e) {
     console.error(e);
-    alert('이미지를 생성하는 중 오류가 발생했습니다.\n(' + e.message + ')');
+    alert('이미지를 가져오는 중 오류가 발생했습니다.\n(' + e.message + ')');
   } finally {
     btn.disabled = false;
-    btn.textContent = '🖼️ AI 감성 배경 이미지 생성하기';
+    btn.textContent = '🖼️ 감성 배경 이미지 가져오기';
   }
 }
 
