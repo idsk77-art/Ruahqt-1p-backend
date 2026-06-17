@@ -11,6 +11,14 @@
 
   <!-- ── 2. Babel (브라우저 내 JSX 실시간 변환기) ── -->
   <script src="https://unpkg.com/@babel/standalone@7.29.7/babel.min.js"></script>
+  
+  <script>
+    Babel.registerPreset('react-classic', {
+      presets: [
+        [Babel.availablePresets['react'], { runtime: 'classic' }]
+      ]
+    });
+  </script>
 
   <!-- ── 3. Firebase SDK v9 Compatibility (CDN 스크립트 버전) ── -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -31,15 +39,23 @@
       color: inherit;
       padding: 0 4px;
       border-radius: 3px;
+      border-bottom: 2px solid rgba(234, 179, 8, 0.65); /* 노란 색연필 밑줄 */
     }
-    mark.hl-yellow { background-color: rgba(250, 204, 21, 0.35); }
-    mark.hl-orange { background-color: rgba(249, 115, 22, 0.25); }
-    mark.hl-red    { background-color: rgba(239, 68, 68, 0.25); }
-    mark.hl-green  { background-color: rgba(34, 197, 94, 0.25); }
-    mark.hl-blue   { background-color: rgba(59, 130, 246, 0.25); }
-    mark.hl-purple { background-color: rgba(168, 85, 247, 0.25); }
-    mark.hl-pink   { background-color: rgba(236, 72, 153, 0.25); }
-    mark.hl-gray   { background-color: rgba(161, 161, 170, 0.25); }
+    mark.hl-yellow { background-color: rgba(250, 204, 21, 0.35); border-bottom: 2px solid rgba(234, 179, 8, 0.65); }
+    mark.hl-orange { background-color: rgba(249, 115, 22, 0.25); border-bottom: 2px solid rgba(234, 88, 12, 0.65); }
+    mark.hl-red    { background-color: rgba(239, 68, 68, 0.25); border-bottom: 2px solid rgba(220, 38, 38, 0.65); }
+    mark.hl-green  { background-color: rgba(34, 197, 94, 0.25); border-bottom: 2px solid rgba(22, 163, 74, 0.65); }
+    mark.hl-blue   { background-color: rgba(59, 130, 246, 0.25); border-bottom: 2px solid rgba(37, 99, 235, 0.65); }
+    mark.hl-purple { background-color: rgba(168, 85, 247, 0.25); border-bottom: 2px solid rgba(147, 51, 234, 0.65); }
+    mark.hl-pink   { background-color: rgba(236, 72, 153, 0.25); border-bottom: 2px solid rgba(219, 39, 119, 0.65); }
+    mark.hl-gray   { background-color: rgba(161, 161, 170, 0.25); border-bottom: 2px solid rgba(113, 113, 122, 0.65); }
+
+    /* ── 일반 밑줄(u 태그 및 인라인 스타일) 색연필 스타일 적용 ── */
+    u, [style*="underline"] {
+      text-decoration-color: rgba(185, 165, 143, 0.8) !important; /* 루아큐티 전용 따뜻한 색연필 샌드 베이지 컬러 */
+      text-decoration-thickness: 2.2px !important;
+      text-underline-offset: 4px !important;
+    }
   </style>
 </head>
 <body>
@@ -47,8 +63,8 @@
   <!-- React 앱이 마운트될 루트 엘리먼트 -->
   <div id="root"></div>
 
-  <!-- type="text/babel" 설정을 통해 Babel이 자바스크립트를 JSX로 실시간 변환하게 합니다 -->
-  <script type="text/babel">
+  <!-- 방금 등록한 커스텀 프리셋(react-classic)과 env를 사용하여 안전하게 컴파일합니다. -->
+  <script type="text/babel" data-presets="react-classic, env">
     const { useState, useEffect } = React;
 
     /* ── 디자인 토큰 정의 ── */
@@ -65,6 +81,16 @@
       if (!text) return "";
       return String(text); // 태그 데이터를 훼손하지 않고 원본 그대로 넘깁니다.
     };
+
+    /* ── 라인 형태의 달력 아이콘 ── */
+    const CalendarIcon = () => (
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+        <line x1="16" y1="2" x2="16" y2="6"></line>
+        <line x1="8" y1="2" x2="8" y2="6"></line>
+        <line x1="3" y1="10" x2="21" y2="10"></line>
+      </svg>
+    );
 
     /* ── Section Component ── */
     const Section = ({ label, icon, children }) => (
@@ -113,6 +139,12 @@
       const [user, setUser] = useState(null);
       const [visitors, setVisitors] = useState({ today: 0, total: 0 });
       const [toast, setToast] = useState({ show: false, message: "" });
+
+      /* ── 달력 및 과거 데이터 연동용 상태 ── */
+      const [allQtData, setAllQtData] = useState([]);
+      const [showCalendar, setShowCalendar] = useState(false);
+      const [calYearMonth, setCalYearMonth] = useState(new Date()); 
+      /* ──────────────────────────────────────────────── */
 
       const handleZoomIn = () => setFontScale(prev => Math.min(prev + 0.15, 1.6));
       const handleZoomOut = () => setFontScale(prev => Math.max(prev - 0.15, 0.8));
@@ -198,52 +230,91 @@
         fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`)
           .then(res => res.text())
           .then(text => {
-            const data = JSON.parse(text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1));
-            let cols = data.table.cols.map(c => c?.label?.replace(/\s+/g, '') || "");
-            let rows = data.table.rows;
-            
-            if (!cols.some(c => c !== "") && rows.length > 0) {
-              cols = rows[0].c.map(cell => cell?.v ? String(cell.v).replace(/\s+/g, '') : "");
-              rows = rows.slice(1);
-            }
-            
-            if (rows.length === 0) throw new Error("시트가 비어있습니다.");
+            try {
+              const startIdx = text.indexOf('{');
+              const endIdx = text.lastIndexOf('}');
+              if (startIdx === -1 || endIdx === -1) {
+                throw new Error("올바른 데이터를 파싱할 수 없습니다. 구글 시트의 공유 범위 설정(링크가 있는 모든 사용자에게 뷰어로 공개)을 꼭 확인해 주세요.");
+              }
+              const jsonString = text.substring(startIdx, endIdx + 1);
+              const data = JSON.parse(jsonString);
+              
+              if (data.status === "error") {
+                throw new Error(data.errors?.[0]?.detailed_message || "구글 시트 에러가 발생했습니다.");
+              }
 
-            const parsedRows = rows.map(r => {
-              const obj = {};
-              cols.forEach((colName, idx) => {
-                if (!colName) return;
-                let val = r.c[idx] ? (r.c[idx].f || r.c[idx].v || "") : "";
-                
-                if (typeof val === 'string') {
-                  if (val.startsWith('Date(')) {
-                    const m = val.match(/Date\((\d+),\s*(\d+),\s*(\d+)/);
-                    if (m) val = `${m[1]}-${String(parseInt(m[2]) + 1).padStart(2, '0')}-${String(m[3]).padStart(2, '0')}`;
-                  } else if (val.match(/^\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\.?$/)) {
-                    val = val.replace(/\s/g, '').replace(/\.$/, '').split('.').map((n, i) => i > 0 ? n.padStart(2, '0') : n).join('-');
+              let cols = data.table.cols.map(c => c?.label?.replace(/\s+/g, '') || "");
+              let rows = data.table.rows;
+              
+              if (!cols.some(c => c !== "") && rows.length > 0) {
+                cols = rows[0].c.map(cell => cell?.v ? String(cell.v).replace(/\s+/g, '') : "");
+                rows = rows.slice(1);
+              }
+              
+              if (rows.length === 0) throw new Error("시트가 비어있습니다.");
+
+              const parsedRows = rows.map(r => {
+                const obj = {};
+                cols.forEach((colName, idx) => {
+                  if (!colName) return;
+                  let val = r.c[idx] ? (r.c[idx].f || r.c[idx].v || "") : "";
+                  
+                  if (typeof val === 'string') {
+                    if (val.startsWith('Date(')) {
+                      const m = val.match(/Date\((\d+),\s*(\d+),\s*(\d+)/);
+                      if (m) val = `${m[1]}-${String(parseInt(m[2]) + 1).padStart(2, '0')}-${String(m[3]).padStart(2, '0')}`;
+                    } else if (val.match(/^\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\.?$/)) {
+                      val = val.replace(/\s/g, '').replace(/\.$/, '').split('.').map((n, i) => i > 0 ? n.padStart(2, '0') : n).join('-');
+                    }
                   }
-                }
-                obj[colName] = val;
-              });
-              return obj;
-            }).filter(r => r["날짜"] || r["Date"] || r["본문내용"]);
+                  obj[colName] = val;
+                });
+                return obj;
+              }).filter(r => r["날짜"] || r["Date"] || r["본문내용"]);
 
-            const todayStr = new Intl.DateTimeFormat('ko-KR', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit' })
-                             .format(new Date()).replace(/(\. |\.)/g, '-').replace(/-$/, '');
-            
-            let selectedRow = parsedRows.find(r => (r["날짜"] || r["Date"]) === todayStr);
-            if (!selectedRow) {
-              const pastRows = parsedRows.filter(r => (r["날짜"] || r["Date"]) < todayStr)
-                                         .sort((a, b) => (b["날짜"] || b["Date"]).localeCompare(a["날짜"] || a["Date"]));
-              selectedRow = pastRows.length > 0 ? pastRows[0] : parsedRows[parsedRows.length - 1];
+              setAllQtData(parsedRows);
+
+              const todayStr = new Intl.DateTimeFormat('ko-KR', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit' })
+                               .format(new Date()).replace(/(\. |\.)/g, '-').replace(/-$/, '');
+              
+              // 공유 링크에 ?date=2024-05-15 형태로 특정 날짜가 입력되었는지 확인하고 최우선으로 불러옵니다.
+              const urlParams = new URLSearchParams(window.location.search);
+              const targetDate = urlParams.get('date');
+
+              let selectedRow;
+              if (targetDate) {
+                selectedRow = parsedRows.find(r => (r["날짜"] || r["Date"]) === targetDate);
+              }
+
+              // 날짜 파라미터가 없거나 해당 날짜의 데이터가 없으면 기본으로 오늘 날짜를 찾습니다.
+              if (!selectedRow) {
+                selectedRow = parsedRows.find(r => (r["날짜"] || r["Date"]) === todayStr);
+              }
+
+              // 오늘 날짜 데이터도 없으면 가장 최신의 과거 날짜를 보여줍니다.
+              if (!selectedRow) {
+                const pastRows = parsedRows.filter(r => (r["날짜"] || r["Date"]) < todayStr)
+                                           .sort((a, b) => (b["날짜"] || b["Date"]).localeCompare(a["날짜"] || a["Date"]));
+                selectedRow = pastRows.length > 0 ? pastRows[0] : parsedRows[parsedRows.length - 1];
+              }
+              
+              setQtData(selectedRow);
+              
+              if(selectedRow) {
+                 const parsedDate = new Date(selectedRow["날짜"] || selectedRow["Date"]);
+                 if(!isNaN(parsedDate)) setCalYearMonth(parsedDate);
+              }
+              
+              setLoading(false);
+            } catch (innerErr) {
+              console.error("Data Parse Error:", innerErr);
+              setError("스프레드시트 데이터를 로드하지 못했습니다. 구글 시트가 '공개(링크가 있는 모든 사용자 뷰어)' 상태인지 먼저 확인해 주세요.");
+              setLoading(false);
             }
-            
-            setQtData(selectedRow);
-            setLoading(false);
           })
           .catch(err => {
             console.error(err);
-            setError("데이터를 불러오지 못했습니다.");
+            setError("데이터 서버 통신에 실패했습니다.");
             setLoading(false);
           });
 
@@ -319,17 +390,52 @@
       const dynVerseStyle = { margin: "0 0 18px", lineHeight: "2", fontSize: `${verseFontSize}px` };
       const zoomBtnStyle = { background: "transparent", border: "1px solid rgba(255,255,255,0.2)", color: "#FFFFFF", width: "36px", height: "32px", borderRadius: "6px", display: "flex", justifyContent: "center", alignItems: "center", fontSize: "14px", cursor: "pointer", fontFamily: "sans-serif" };
 
+      /* ── 공유 시 현재 보여지는 큐티 날짜가 URL 파라미터로 포함되도록 수정 ── */
       const handleShareLink = () => {
-        copyToClipboard(window.location.href, "🔗 큐티 공유 링크가 복사되었습니다!");
+        const shareUrl = new URL(window.location.href);
+        if(dateStr) {
+          shareUrl.searchParams.set('date', dateStr);
+        }
+        copyToClipboard(shareUrl.toString(), "🔗 해당 날짜의 큐티 링크가 복사되었습니다!");
       };
 
       const handleShareText = () => {
         const cleanVerses = versesText 
           ? versesText.replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]*>/g, '').split('\n').map(line => line.trim()).filter(Boolean).join('\n')
           : "";
-        const cleanMed = medText 
-          ? medText.replace(/<[^>]*>/g, '').split('\n').map(line => line.trim()).filter(Boolean).join('\n\n')
-          : "";
+
+        // 말씀 묵상 데이터 복사용 지능형 가공
+        const cleanMedLines = [];
+        let prevWasSubtitle = false;
+
+        if (medText) {
+          medText.split('\n').forEach((line) => {
+            const cleanLine = line.replace(/<[^>]*>/g, '').trim();
+            if (!cleanLine) {
+              cleanMedLines.push("");
+              prevWasSubtitle = false;
+              return;
+            }
+
+            const processedLine = cleanLine.replace(/❝\s*(.*?)\s*❞/g, '◼︎ $1');
+            const subSymbols = ['■', '◼', '◼︎', '▪', '❝', '▶', '✔', '✅', '✦', '★'];
+            const isSub = subSymbols.some(symbol => processedLine.startsWith(symbol)) || processedLine.startsWith('# ') || processedLine.match(/^\[(.*)\]$/);
+
+            if (isSub) {
+              if (cleanMedLines.length > 0 && cleanMedLines[cleanMedLines.length - 1] !== "") {
+                cleanMedLines.push("");
+              }
+              cleanMedLines.push(processedLine);
+              prevWasSubtitle = true;
+            } else {
+              cleanMedLines.push(processedLine);
+              prevWasSubtitle = false;
+            }
+          });
+        }
+
+        const cleanMed = cleanMedLines.filter((l, i, arr) => !(l === "" && arr[i - 1] === "")).join('\n');
+
         const cleanPrayer = prayerText 
           ? prayerText.replace(/<[^>]*>/g, '').split('\n').map(line => line.trim()).filter(Boolean).join('\n\n')
           : "";
@@ -351,13 +457,11 @@ ${cleanPrayer}
         copyToClipboard(fullShareText, "📝 전체 묵상 텍스트가 복사되었습니다!");
       };
 
-      /* ── [개선 완료] 말씀 묵상 섹션 강제 여백 제거 및 데이터 줄바꿈 유지 ── */
       const formatText = (text) => {
         if (!text) return null;
         return String(text).split('\n').map((line, idx, arr) => {
           const trimmed = line.trim();
           
-          // 데이터에 의도적인 빈 줄(엔터 2번)이 있을 경우에만 시각적 여백 제공
           if (!trimmed) return <div key={idx} style={{ height: `${16 * fontScale}px` }} />;
 
           let isSubtitle = false;
@@ -365,7 +469,6 @@ ${cleanPrayer}
 
           content = content.replace(/❝\s*(.*?)\s*❞/g, '◼︎ $1');
 
-          // HTML 태그를 무시한 순수 텍스트를 추출하여 기호를 감지합니다.
           const plainText = content.replace(/<[^>]*>/g, '').trim();
 
           const subSymbols = ['■', '◼', '◼︎', '▪', '❝', '▶', '✔', '✅', '✦', '★'];
@@ -382,8 +485,7 @@ ${cleanPrayer}
 
           if (isSubtitle) {
             const subStyle = {
-              // 소제목 상하 여백을 완전히 제거하여 다음 줄 내용과 딱 붙게 수정
-              margin: idx === 0 ? "0" : `${24 * fontScale}px 0 0`, // 시작 부분 외에는 상단 여백만 살짝 둠
+              margin: idx === 0 ? "0" : `${24 * fontScale}px 0 0`,
               fontSize: "16px",
               fontWeight: "800",
               letterSpacing: "-0.8px",
@@ -392,7 +494,6 @@ ${cleanPrayer}
             return <div key={idx} style={subStyle} dangerouslySetInnerHTML={{ __html: processHTML(content) }} />;
           }
 
-          // 본문 역시 margin: 0 이 적용되어 엔터(줄바꿈) 흐름을 그대로 따라갑니다
           const mStyle = { ...dynBodyStyle, margin: 0 };
           return <div key={idx} style={mStyle} dangerouslySetInnerHTML={{ __html: processHTML(trimmed) }} />;
         });
@@ -423,7 +524,6 @@ ${cleanPrayer}
               if (currentVerse) {
                 return (
                   <div key={idx} style={{ ...dynVerseStyle, display: "flex", alignItems: "flex-start", gap: "10px" }}>
-                    {/* 절 번호 고정 영역 */}
                     <div style={{
                       fontWeight: "800",
                       color: "#71717A",
@@ -436,13 +536,11 @@ ${cleanPrayer}
                     }}>
                       {currentVerse}
                     </div>
-                    {/* 우측 말씀 본문 영역 */}
                     <div style={{ flex: 1, wordBreak: "keep-all", overflowWrap: "break-word" }} dangerouslySetInnerHTML={{ __html: processHTML(content) }} />
                   </div>
                 );
               }
 
-              // 절 번호가 없는 라인 처리
               return (
                 <div key={idx} style={{ ...dynVerseStyle, paddingLeft: "32px", wordBreak: "keep-all", overflowWrap: "break-word" }} dangerouslySetInnerHTML={{ __html: processHTML(content) }} />
               );
@@ -469,9 +567,80 @@ ${cleanPrayer}
         transition: "all 0.2s ease",
       };
 
+      /* ── 미니 달력 렌더링 함수 로직 ── */
+      const renderCalendarDays = () => {
+        const year = calYearMonth.getFullYear();
+        const month = calYearMonth.getMonth();
+        
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        
+        const todayObj = new Date();
+        todayObj.setHours(0, 0, 0, 0);
+
+        const days = [];
+        const weekDays = ['일', '월', '화', '수', '목', '금', '토'];
+
+        weekDays.forEach((day, i) => {
+          days.push(<div key={`wd-${i}`} style={{ fontSize: "12px", color: C.textMute, fontWeight: "700", marginBottom: "8px" }}>{day}</div>);
+        });
+
+        for (let i = 0; i < firstDay; i++) {
+          days.push(<div key={`empty-${i}`} />);
+        }
+
+        for (let i = 1; i <= daysInMonth; i++) {
+          const dateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+          const rowData = allQtData.find(r => (r["날짜"] || r["Date"]) === dateString);
+          
+          const cellDateObj = new Date(year, month, i);
+          // 오늘을 초과하는 미래의 날짜인지 여부
+          const isFuture = cellDateObj > todayObj;
+          
+          // 데이터가 있고 미래가 아닐 때만 활성화
+          const isClickable = !!rowData && !isFuture;
+
+          days.push(
+            <div 
+              key={i} 
+              onClick={() => {
+                if (isClickable) {
+                  setQtData(rowData);
+                  setCalYearMonth(new Date(dateString));
+                  setShowCalendar(false);
+                  
+                  // 브라우저 URL 주소창도 선택한 날짜에 맞게 업데이트 해줍니다. (에러 방지 처리 추가)
+                  try {
+                    const newUrl = new URL(window.location.href);
+                    newUrl.searchParams.set('date', dateString);
+                    window.history.pushState(null, '', newUrl.toString());
+                  } catch (e) {
+                    console.warn("미리보기 환경 등에서 URL 업데이트를 건너뜁니다.", e);
+                  }
+
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+              }}
+              style={{
+                padding: "8px 0",
+                fontSize: "14px",
+                fontWeight: isClickable ? "800" : "400",
+                color: isClickable ? "#18181B" : (isFuture ? "#E4E4E7" : "#D4D4D8"),
+                cursor: isClickable ? "pointer" : "default",
+                borderRadius: "6px",
+                backgroundColor: isClickable && dateStr === dateString ? "#F4F4F5" : "transparent"
+              }}
+            >
+              {i}
+            </div>
+          );
+        }
+        return days;
+      };
+
       return (
         <div style={{ background: C.bgPage, minHeight: "100vh", color: C.text, fontFamily: serif }}>
-          {error && <div style={{ background: "#FEF2F2", color: "#991B1B", padding: "10px", fontSize: "13px", textAlign: "center", fontFamily: "sans-serif", borderBottom: "1px solid #FCA5A5" }}>⚠️ {error}</div>}
+          {error && <div style={{ background: "#FEF2F2", color: "#991B1B", padding: "16px", fontSize: "14px", fontWeight: "600", textAlign: "center", fontFamily: "sans-serif", borderBottom: "1px solid #FCA5A5" }}>⚠️ {error}</div>}
 
           <header style={{ 
             position: "fixed", 
@@ -505,6 +674,9 @@ ${cleanPrayer}
                 </span>
               </div>
               <div style={{ display: "flex", gap: "8px" }}>
+                <button onClick={() => setShowCalendar(true)} style={zoomBtnStyle} title="과거 큐티 검색">
+                  <CalendarIcon />
+                </button>
                 <button onClick={handleShareLink} style={zoomBtnStyle} title="링크 공유">🔗</button>
                 <button onClick={handleZoomOut} style={zoomBtnStyle}>A-</button>
                 <button onClick={handleZoomIn} style={zoomBtnStyle}>A+</button>
@@ -523,6 +695,9 @@ ${cleanPrayer}
                   <span style={{ fontFamily: "sans-serif", fontSize: "12px", color: "#A1A1AA", letterSpacing: "1px" }}>루아큐티</span>
                 </div>
                 <div style={{ display: "flex", gap: "8px" }}>
+                  <button onClick={() => setShowCalendar(true)} style={zoomBtnStyle} title="과거 큐티 검색">
+                    <CalendarIcon />
+                  </button>
                   <button onClick={handleShareLink} style={zoomBtnStyle} title="링크 공유">🔗</button>
                   <button onClick={handleZoomOut} style={zoomBtnStyle}>A-</button>
                   <button onClick={handleZoomIn} style={zoomBtnStyle}>A+</button>
@@ -621,6 +796,63 @@ ${cleanPrayer}
               transition: "opacity 0.2s ease",
             }}>
               {toast.message}
+            </div>
+          )}
+
+          {/* ══ 미니 달력 팝업 오버레이 ══ */}
+          {showCalendar && (
+            <div 
+              style={{
+                position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
+                backgroundColor: "rgba(0,0,0,0.6)", zIndex: 1000,
+                display: "flex", justifyContent: "center", alignItems: "center",
+                padding: "20px"
+              }}
+              onClick={() => setShowCalendar(false)} 
+            >
+              <div 
+                style={{
+                  backgroundColor: "#FFFFFF", width: "100%", maxWidth: "340px",
+                  borderRadius: "16px", padding: "24px", boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
+                  fontFamily: "sans-serif"
+                }}
+                onClick={(e) => e.stopPropagation()} 
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+                  <button 
+                    onClick={() => setCalYearMonth(new Date(calYearMonth.getFullYear(), calYearMonth.getMonth() - 1, 1))}
+                    style={{ background: "none", border: "none", fontSize: "16px", cursor: "pointer", color: C.textSub, padding: "8px" }}
+                  >
+                    ◀
+                  </button>
+                  <div style={{ fontSize: "16px", fontWeight: "800", color: C.text }}>
+                    {calYearMonth.getFullYear()}년 {calYearMonth.getMonth() + 1}월
+                  </div>
+                  <button 
+                    onClick={() => setCalYearMonth(new Date(calYearMonth.getFullYear(), calYearMonth.getMonth() + 1, 1))}
+                    style={{ background: "none", border: "none", fontSize: "16px", cursor: "pointer", color: C.textSub, padding: "8px" }}
+                  >
+                    ▶
+                  </button>
+                </div>
+
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: "4px", textAlign: "center" }}>
+                  {renderCalendarDays()}
+                </div>
+
+                <div style={{ marginTop: "24px", textAlign: "center" }}>
+                  <button 
+                    onClick={() => setShowCalendar(false)}
+                    style={{
+                      background: "#F4F4F5", border: "none", padding: "10px 24px",
+                      borderRadius: "8px", fontSize: "13px", fontWeight: "700",
+                      color: C.textSub, cursor: "pointer"
+                    }}
+                  >
+                    닫기
+                  </button>
+                </div>
+              </div>
             </div>
           )}
         </div>
